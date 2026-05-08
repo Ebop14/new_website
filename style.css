@@ -31,6 +31,7 @@
 
 html, body {
   height: 100%;
+  background: #080808;
 }
 
 body {
@@ -71,6 +72,16 @@ body::before {
   display: flex;
   flex-direction: column;
   padding-top: 22vh;
+}
+
+/* ── Name letter highlight ── */
+.nl {
+  transition: color 1s ease;
+}
+
+.nl.lit {
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.1s ease;
 }
 
 /* ── Name ── */

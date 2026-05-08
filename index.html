@@ -87,6 +87,44 @@
     document.querySelectorAll('.built-list li').forEach(li => {
       li.addEventListener('click', () => li.classList.toggle('revealed'));
     });
+
+    // Wrap all text nodes into letter spans
+    function wrapLetters(el) {
+      Array.from(el.childNodes).forEach(node => {
+        if (node.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          node.textContent.split('').forEach(char => {
+            if (char.trim() === '') {
+              frag.appendChild(document.createTextNode(char));
+            } else {
+              const s = document.createElement('span');
+              s.className = 'nl';
+              s.textContent = char;
+              frag.appendChild(s);
+            }
+          });
+          node.parentNode.replaceChild(frag, node);
+        } else if (node.nodeType === 1 && !['SCRIPT','STYLE','A'].includes(node.tagName)) {
+          wrapLetters(node);
+        }
+      });
+    }
+
+    document.querySelectorAll('.name, .page-content').forEach(wrapLetters);
+
+    // Key highlight — per-span timeouts fix multi-letter fade-out
+    const spanTimeouts = new WeakMap();
+    document.addEventListener('keydown', e => {
+      if (e.key.length !== 1) return;
+      const key = e.key.toLowerCase();
+      document.querySelectorAll('.nl').forEach(span => {
+        if (span.textContent.toLowerCase() === key) {
+          span.classList.add('lit');
+          clearTimeout(spanTimeouts.get(span));
+          spanTimeouts.set(span, setTimeout(() => span.classList.remove('lit'), 1400));
+        }
+      });
+    });
   </script>
 </body>
 </html>
