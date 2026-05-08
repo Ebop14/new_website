@@ -4,36 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ethan Child</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="prefetch" href="built.html" />
 </head>
 <body>
   <div class="shell">
     <div class="landing">
       <nav class="landing-nav">
-        <a href="index.html" class="active">about me</a>
-        <a href="built.html">things I've built</a>
+        <a href="#" data-page="home" class="active">home</a>
+        <a href="#" data-page="built">things I've built</a>
       </nav>
       <div class="name">Ethan Child</div>
-      <div class="page-content">
+
+      <!-- Home -->
+      <div id="page-home" class="page-content">
         <div class="section-label">about me</div>
         <div class="about-text">
           <p>
-            Hi! My name is Ethan. I work the Internal AI team at Ramp. Before that, I spent some time at Battery Ventures, where I spent much of my time sourcing -_- 
-            
+            Hi! My name is Ethan. I work the Internal AI team at Ramp. Before that, I spent some time at Battery Ventures, where I spent much of my time sourcing -_-
             Before that, I graduated from Dartmouth as a double major in Economics and Computer Science, where I also played Rugby.
           </p>
           <p>
             I also like to draw!
           </p>
           <p>
-            I deleted LinkedIn a while ago, but you can reach me at 
+            I deleted LinkedIn a while ago, but you can reach me at
           </p>
         </div>
       </div>
+
+      <!-- Built -->
+      <div id="page-built" class="page-content" hidden>
+        <div class="section-label">things I've built</div>
+        <ul class="built-list">
+          <li>
+            <span class="impact">Saved $3M (and counting)!</span>
+            <span class="label">AI email writing agent for Ramp AEs</span>
+          </li>
+          <li>
+            <span class="impact">Adopted as the main means of escalation</span>
+            <span class="label">Escalation path from Ramp's CX team to the Post-Sales (AM) team</span>
+          </li>
+          <li>
+            <span class="impact">Got runner up!</span>
+            <span class="label">Built an AI SDR co-pilot for the Ramp Hackathon</span>
+          </li>
+          <li>
+            <span class="impact">So much sourcing.</span>
+            <span class="label">Sourced a lot of companies for Battery</span>
+          </li>
+        </ul>
+      </div>
+
       <nav class="social">
         <a class="linkedin" href="https://linkedin.com/in/ethan-child" target="_blank" rel="noopener" aria-label="LinkedIn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -49,5 +70,23 @@
       </nav>
     </div>
   </div>
+
+  <script>
+    const nav = document.querySelectorAll('.landing-nav a');
+    const pages = document.querySelectorAll('.page-content');
+
+    nav.forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const page = a.dataset.page;
+        pages.forEach(p => p.hidden = p.id !== 'page-' + page);
+        nav.forEach(n => n.classList.toggle('active', n === a));
+      });
+    });
+
+    document.querySelectorAll('.built-list li').forEach(li => {
+      li.addEventListener('click', () => li.classList.toggle('revealed'));
+    });
+  </script>
 </body>
 </html>
