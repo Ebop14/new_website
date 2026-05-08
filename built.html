@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Things I've Built — Ethan Child</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=block" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <div class="landing">
+      <nav class="landing-nav">
+        <a href="index.html">about me</a>
+        <a href="built.html" class="active">things I've built</a>
+      </nav>
+      <div class="name">Ethan Child</div>
+      <div class="page-content">
+        <div class="section-label">things I've built</div>
+        <ul class="built-list">
+          <li>
+            <span class="impact">Saved $3M (and counting)!</span>
+            <span class="label">AI email writing agent for Ramp AEs</span>
+          </li>
+          <li>
+            <span class="impact">Adopted as the main means of escalation</span>
+            <span class="label">Escalation path from Ramp's CX team to the Post-Sales (AM) team</span>
+          </li>
+          <li>
+            <span class="impact">Got runner up!</span>
+            <span class="label">Built an AI SDR co-pilot for the Ramp Hackathon</span>
+          </li>
+          <li>
+            <span class="impact">So much sourcing.</span>
+            <span class="label">Sourced a lot of companies for Battery</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.built-list li').forEach(li => {
+      li.addEventListener('click', () => li.classList.toggle('revealed'));
+    });
+  </script>
+</body>
+</html>
