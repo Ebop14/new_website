@@ -142,6 +142,21 @@
 
     document.querySelectorAll('.name, .page-content').forEach(wrapLetters);
 
+    // Keep social icons at a consistent vertical position across all tabs
+    function syncPageHeight() {
+      const contentEls = document.querySelectorAll('.page-content');
+      let maxH = 0;
+      contentEls.forEach(p => {
+        const wasHidden = p.hidden;
+        p.hidden = false;
+        maxH = Math.max(maxH, p.offsetHeight);
+        p.hidden = wasHidden;
+      });
+      contentEls.forEach(p => p.style.minHeight = maxH + 'px');
+    }
+    document.fonts.ready.then(syncPageHeight);
+    window.addEventListener('resize', syncPageHeight);
+
     // Key highlight — per-span timeouts fix multi-letter fade-out
     const spanTimeouts = new WeakMap();
     document.addEventListener('keydown', e => {
