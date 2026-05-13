@@ -272,6 +272,216 @@ body::before {
   line-height: 1.5;
 }
 
+/* ── Draw link ── */
+.draw-link {
+  cursor: pointer;
+  color: var(--text);
+  border-bottom: 1px dashed rgba(240, 240, 240, 0.45);
+  padding-bottom: 1px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  user-select: none;
+}
+
+.draw-link:hover,
+.draw-link:focus-visible {
+  border-bottom-color: var(--text);
+  outline: none;
+}
+
+/* ── Close-all button ── */
+.close-all {
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
+}
+
+.close-all.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.close-all:hover,
+.close-all:focus-visible {
+  color: var(--text);
+  outline: none;
+}
+
+/* ── Drawings layer ── */
+.drawings-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.drawing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
+  opacity: 0;
+  transition:
+    transform 0.85s cubic-bezier(0.18, 0.9, 0.32, 1.1) var(--delay, 0ms),
+    opacity 0.5s ease var(--delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.drawing.settled {
+  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot));
+  opacity: 1;
+}
+
+.drawing.dismissing {
+  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 40px)) scale(0.6) rotate(var(--rot));
+  opacity: 0;
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.drawing-frame {
+  position: relative;
+  width: 180px;
+  padding-top: 44px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #131313;
+  box-shadow:
+    0 18px 40px -16px rgba(0, 0, 0, 0.7),
+    0 2px 6px -2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.drawing-frame:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 26px 50px -16px rgba(0, 0, 0, 0.8),
+    0 4px 10px -2px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.drawing-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.drawing-actions {
+  position: absolute;
+  top: 11px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.drawing-frame:hover .drawing-actions,
+.drawing-frame:focus-within .drawing-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.drawing-action {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 3px;
+  background: rgba(8, 8, 8, 0.75);
+  color: #f0f0f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.drawing-action:hover {
+  background: rgba(8, 8, 8, 0.95);
+}
+
+.drawing-action svg {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+/* ── Lightbox ── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(8, 8, 8, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 5vw;
+  opacity: 0;
+  transition: opacity 0.25s ease, background-color 0.25s ease;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox.open {
+  opacity: 1;
+  background: rgba(8, 8, 8, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+  transform: scale(0.96);
+  transition: transform 0.3s ease;
+}
+
+.lightbox.open img {
+  transform: scale(1);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f0f0f0;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 @media (max-width: 640px) {
   :root { --gutter: 28px; }
+  .drawing-frame { width: 140px; }
 }

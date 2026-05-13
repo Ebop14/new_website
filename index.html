@@ -26,7 +26,7 @@
             Before that, I graduated from Dartmouth as a double major in Economics and Computer Science, where I also played Rugby.
           </p>
           <p>
-            I also like to draw!
+            I also like to <span class="draw-link" role="button" tabindex="0">draw</span>!<button class="close-all" type="button" hidden>× close all</button>
           </p>
           <p>
             I deleted LinkedIn (the app) a while ago, but you can reach me at ethan [at] echild.cc
@@ -101,6 +101,12 @@
     </div>
   </div>
 
+  <div class="drawings-layer" aria-hidden="true"></div>
+  <div class="lightbox" hidden>
+    <button class="lightbox-close" aria-label="Close">×</button>
+    <img alt="" />
+  </div>
+
   <script>
     const nav = document.querySelectorAll('.landing-nav a');
     const pages = document.querySelectorAll('.page-content');
@@ -134,7 +140,7 @@
             }
           });
           node.parentNode.replaceChild(frag, node);
-        } else if (node.nodeType === 1 && !['SCRIPT','STYLE','A'].includes(node.tagName)) {
+        } else if (node.nodeType === 1 && !['SCRIPT','STYLE','A','BUTTON'].includes(node.tagName)) {
           wrapLetters(node);
         }
       });
@@ -169,6 +175,187 @@
           spanTimeouts.set(span, setTimeout(() => span.classList.remove('lit'), 1400));
         }
       });
+    });
+
+    // ── Drawing burst ──
+    const drawingSources = [
+      'https://picsum.photos/seed/draw-1/520/380',
+      'https://picsum.photos/seed/draw-2/420/520',
+      'https://picsum.photos/seed/draw-3/560/420',
+      'https://picsum.photos/seed/draw-4/440/440',
+      'https://picsum.photos/seed/draw-5/500/360',
+      'https://picsum.photos/seed/draw-6/380/500'
+    ];
+
+    const drawLink = document.querySelector('.draw-link');
+    const drawingsLayer = document.querySelector('.drawings-layer');
+    const closeAllBtn = document.querySelector('.close-all');
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+    const lightboxClose = lightbox.querySelector('.lightbox-close');
+
+    function showCloseAll() {
+      if (closeAllBtn.classList.contains('show')) return;
+      closeAllBtn.hidden = false;
+      // Force reflow so the transition runs from the initial state
+      void closeAllBtn.offsetWidth;
+      closeAllBtn.classList.add('show');
+    }
+
+    function hideCloseAll() {
+      if (!closeAllBtn.classList.contains('show')) return;
+      closeAllBtn.classList.remove('show');
+      const onEnd = e => {
+        if (e.propertyName !== 'opacity') return;
+        closeAllBtn.removeEventListener('transitionend', onEnd);
+        closeAllBtn.hidden = true;
+      };
+      closeAllBtn.addEventListener('transitionend', onEnd);
+    }
+
+    function dismissDrawing(wrap) {
+      if (wrap.classList.contains('dismissing')) return;
+      wrap.classList.add('dismissing');
+      wrap.addEventListener('transitionend', () => {
+        wrap.remove();
+        if (!drawingsLayer.querySelector('.drawing')) hideCloseAll();
+      }, { once: true });
+    }
+
+    function clearDrawings() {
+      drawingsLayer.querySelectorAll('.drawing').forEach(d => d.remove());
+    }
+
+    function spawnDrawings() {
+      clearDrawings();
+
+      // Make the close-all button measurable BEFORE positioning drawings, so
+      // we can avoid landing any image on top of it. It's still invisible
+      // (opacity: 0 without the .show class) — only its layout exists.
+      closeAllBtn.hidden = false;
+      void closeAllBtn.offsetWidth;
+
+      const rect = drawLink.getBoundingClientRect();
+      const closeAllRect = closeAllBtn.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Exclusion zone around the close-all button. Padded by a drawing's
+      // approximate half-size so a drawing's center placed outside this zone
+      // can't have its frame overlap the button.
+      const exclPadX = 110;
+      const exclPadY = 110;
+      const exclLeft = closeAllRect.left - exclPadX;
+      const exclRight = closeAllRect.right + exclPadX;
+      const exclTop = closeAllRect.top - exclPadY;
+      const exclBottom = closeAllRect.bottom + exclPadY;
+
+      drawingSources.forEach((src, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'drawing';
+        wrap.innerHTML =
+          '<div class="drawing-frame">' +
+            '<img src="' + src + '" alt="" draggable="false" />' +
+            '<div class="drawing-actions">' +
+              '<button class="drawing-action max" type="button" aria-label="Maximize">' +
+                '<svg viewBox="0 0 16 16"><path d="M3 3h4M3 3v4M13 3H9M13 3v4M3 13h4M3 13v-4M13 13H9M13 13v-4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>' +
+              '</button>' +
+              '<button class="drawing-action close" type="button" aria-label="Remove">' +
+                '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+
+        wrap.style.left = originX + 'px';
+        wrap.style.top = originY + 'px';
+        drawingsLayer.appendChild(wrap);
+
+        // Distribute angles evenly with jitter so they shoot in different directions
+        const baseAngle = (i / drawingSources.length) * Math.PI * 2;
+        const angle = baseAngle + (Math.random() - 0.5) * 0.6;
+        // Distance proportional to viewport, with a minimum to clear the word
+        const minDim = Math.min(vw, vh);
+        const distance = minDim * (0.22 + Math.random() * 0.18);
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance * 0.85;
+        const rot = (Math.random() - 0.5) * 24;
+
+        // Clamp so they stay within the page's black-space border.
+        // Margins are from the drawing's center, so they include ~half a frame
+        // plus the gutter we want to preserve.
+        const sideMargin = 140;
+        const topMargin = 160;
+        const bottomMargin = 220;
+        let clampedDx = Math.max(sideMargin - originX, Math.min(vw - sideMargin - originX, dx));
+        let clampedDy = Math.max(topMargin - originY, Math.min(vh - bottomMargin - originY, dy));
+
+        // If the landing center falls in the close-all exclusion zone, push it
+        // vertically to whichever edge is nearer, then re-clamp to viewport.
+        const cx = originX + clampedDx;
+        let cy = originY + clampedDy;
+        if (cx > exclLeft && cx < exclRight && cy > exclTop && cy < exclBottom) {
+          cy = (cy - exclTop) < (exclBottom - cy) ? exclTop - 1 : exclBottom + 1;
+          cy = Math.max(topMargin, Math.min(vh - bottomMargin, cy));
+          clampedDy = cy - originY;
+        }
+
+        wrap.style.setProperty('--dx', clampedDx + 'px');
+        wrap.style.setProperty('--dy', clampedDy + 'px');
+        wrap.style.setProperty('--rot', rot + 'deg');
+        wrap.style.setProperty('--delay', (i * 35) + 'ms');
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => wrap.classList.add('settled'));
+        });
+
+        wrap.querySelector('.close').addEventListener('click', e => {
+          e.stopPropagation();
+          dismissDrawing(wrap);
+        });
+
+        wrap.querySelector('.max').addEventListener('click', e => {
+          e.stopPropagation();
+          openLightbox(src);
+        });
+      });
+
+      showCloseAll();
+    }
+
+    closeAllBtn.addEventListener('click', () => {
+      drawingsLayer.querySelectorAll('.drawing').forEach(dismissDrawing);
+    });
+
+    drawLink.addEventListener('click', spawnDrawings);
+    drawLink.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        spawnDrawings();
+      }
+    });
+
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.hidden = false;
+      requestAnimationFrame(() => lightbox.classList.add('open'));
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightbox.addEventListener('transitionend', () => {
+        lightbox.hidden = true;
+        lightboxImg.src = '';
+      }, { once: true });
+    }
+
+    lightbox.addEventListener('click', e => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    lightboxClose.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
     });
   </script>
 </body>
