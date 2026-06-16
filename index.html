@@ -43,15 +43,15 @@
             <span class="label">AI email writing agent for Ramp AEs</span>
           </li>
           <li>
-            <span class="impact">Adopted as the main means of escalation</span>
+            <span class="impact">Adopted as the primary means of escalation</span>
             <span class="label">Escalation path from Ramp's CX team to the Post-Sales (AM) team</span>
           </li>
           <li>
-            <span class="impact">Trained a Transformer Model to play Tic Tac Toe and Checkers</span>
-            <span class="label">Tic Tac Toe and Checkers Transformer</span>
+            <span class="impact">Trained a Transformer Model to play Checkers</span>
+            <span class="label">Checkers Transformer</span>
           </li>
           <li>
-            <span class="impact">Fine-Tuned a Transformer Model to generate video game music MIDI files</span>
+            <span class="impact">Trained a Transformer to generate video game music MIDI files</span>
             <span class="label">Video Game Music MIDI Transformer</span>
           </li>
           <li>
@@ -59,7 +59,7 @@
             <span class="label">Built an AI SDR co-pilot for the Ramp Hackathon</span>
           </li>
           <li>
-            <span class="impact">So much sourcing.</span>
+            <span class="impact">So much sourcing. Lots of companies.</span>
             <span class="label">Sourced a lot of companies for Battery</span>
           </li>
         </ul>
@@ -117,7 +117,10 @@
   <div class="drawings-layer" aria-hidden="true"></div>
   <div class="lightbox" hidden>
     <button class="lightbox-close" aria-label="Close">×</button>
+    <button class="lightbox-nav prev" aria-label="Previous drawing">‹</button>
     <img alt="" />
+    <button class="lightbox-nav next" aria-label="Next drawing">›</button>
+    <div class="lightbox-counter" aria-hidden="true"></div>
   </div>
 
   <script>
@@ -207,6 +210,9 @@
     const lightbox = document.querySelector('.lightbox');
     const lightboxImg = lightbox.querySelector('img');
     const lightboxClose = lightbox.querySelector('.lightbox-close');
+    const lightboxPrev = lightbox.querySelector('.lightbox-nav.prev');
+    const lightboxNext = lightbox.querySelector('.lightbox-nav.next');
+    const lightboxCounter = lightbox.querySelector('.lightbox-counter');
 
     function showCloseAll() {
       if (closeAllBtn.classList.contains('show')) return;
@@ -329,10 +335,14 @@
           dismissDrawing(wrap);
         });
 
-        wrap.querySelector('.max').addEventListener('click', e => {
+        // Both the explicit maximize button and the image itself open the
+        // gallery at this drawing's position.
+        const open = e => {
           e.stopPropagation();
-          openLightbox(src);
-        });
+          openLightbox(i);
+        };
+        wrap.querySelector('.max').addEventListener('click', open);
+        wrap.querySelector('img').addEventListener('click', open);
       });
 
       showCloseAll();
@@ -350,10 +360,28 @@
       }
     });
 
-    function openLightbox(src) {
-      lightboxImg.src = src;
+    let lightboxIndex = 0;
+
+    function renderLightbox() {
+      lightboxImg.classList.remove('loaded');
+      lightboxImg.src = drawingSources[lightboxIndex];
+      lightboxCounter.textContent =
+        (lightboxIndex + 1) + ' / ' + drawingSources.length;
+    }
+
+    lightboxImg.addEventListener('load', () => lightboxImg.classList.add('loaded'));
+
+    function openLightbox(index) {
+      lightboxIndex = index;
+      renderLightbox();
       lightbox.hidden = false;
       requestAnimationFrame(() => lightbox.classList.add('open'));
+    }
+
+    function stepLightbox(dir) {
+      const n = drawingSources.length;
+      lightboxIndex = (lightboxIndex + dir + n) % n;
+      renderLightbox();
     }
 
     function closeLightbox() {
@@ -368,8 +396,13 @@
       if (e.target === lightbox) closeLightbox();
     });
     lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', e => { e.stopPropagation(); stepLightbox(-1); });
+    lightboxNext.addEventListener('click', e => { e.stopPropagation(); stepLightbox(1); });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+      if (lightbox.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') stepLightbox(-1);
+      else if (e.key === 'ArrowRight') stepLightbox(1);
     });
   </script>
 </body>
