@@ -233,45 +233,6 @@ body::before {
 }
 
 
-/* ── Work log ── */
-.work-log {
-  display: flex;
-  flex-direction: column;
-}
-
-.work-row {
-  display: flex;
-  align-items: center;
-  gap: 1.6em;
-  padding: 10px 0;
-}
-
-.wy {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  width: 9em;
-  flex-shrink: 0;
-}
-
-.wi {
-  flex: 1;
-}
-
-.wc {
-  font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.5;
-}
-
-.wr {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-}
-
 /* ── Draw link ── */
 .draw-link {
   cursor: pointer;
