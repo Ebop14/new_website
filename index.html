@@ -6,26 +6,113 @@
   <title>Ethan Child</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter+Tight:wght@400;500;600&display=swap" />
+  <script src="settings.js"></script>
 </head>
-<body>
+<body data-state="outside" class="no-anim">
+
+  <!-- ── Entry: the door ── -->
+  <section class="entry" aria-label="Entrance">
+    <div class="entry-name">Ethan Child</div>
+
+    <div class="scene">
+      <svg class="scene-art" viewBox="0 40 560 600" aria-hidden="true">
+        <defs>
+          <filter id="soft-shadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+        </defs>
+        <g class="shadows"></g>
+        <g class="pieces"></g>
+      </svg>
+
+      <div class="doorway" aria-hidden="true"></div>
+
+      <button class="door" type="button" aria-label="Open the door">
+        <svg viewBox="0 0 194 200" preserveAspectRatio="none" aria-hidden="true">
+          <rect class="door-face" width="194" height="200" />
+          <rect class="door-panel" x="44" y="18" width="130" height="72" />
+          <rect class="door-panel" x="44" y="108" width="130" height="74" />
+          <circle class="knob" cx="22" cy="104" r="9" />
+        </svg>
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ── Inside ── -->
   <div class="shell">
     <div class="landing">
-      <nav class="landing-nav">
-        <a href="#" data-page="home" class="active">about me</a>
-        <a href="#" data-page="built">things I've built</a>
-      </nav>
       <div class="name">Ethan Child</div>
 
+      <nav class="landing-nav">
+        <a href="#about" data-page="about">
+          <svg class="critter minimal" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="feature" d="M31 74 L30 44 C30 35 44 33 47 42" />
+            <path class="feature" d="M38 74 L38 47" />
+            <path class="feature-fill" d="M29 45 C30 34 45 32 48 42 C44 40 36 39 29 45 Z" />
+            <path class="feature" d="M60 58 C63 44 62 30 54 28 C48 27 45 33 48 37 C50 39 53 37 53 35" />
+            <path class="feature" d="M53 40 L53 49" />
+            <g class="eye" data-r="4"><g class="look"><path class="tick" d="M48 63 L47 69" /></g></g>
+            <g class="eye" data-r="4"><g class="look"><path class="tick" d="M60 59 L60 64" /></g></g>
+            <path class="mark" d="M64 74 L63 82 M69 73 L69 81" />
+            <path class="ink-fill" d="M62 92 C64 89 68 87 71 86 C70 90 67 92 62 92 Z" />
+          </svg>
+          <span>about me</span>
+        </a>
+        <a href="#built" data-page="built">
+          <svg class="critter horned" style="--crit: var(--p2)" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="line" d="M62 24 C63 15 70 9 75 12 C79 15 77 21 72 21 C69 21 68 17 71 16" />
+            <path class="line" d="M40 24 C34 18 36 10 42 8 M45 22 C43 16 46 12 51 12" />
+            <path class="body" d="M26 93 C20 76 21 58 27 45 C30 30 40 21 53 21 C67 21 77 31 77 45 L76 58 C80 70 81 84 76 93 Z" />
+            <path class="fine" d="M28 68 q3 4 6 0 q3 4 6 0 M27 78 q3 4 6 0 q3 4 6 0 q3 4 6 0 M30 87 q3 4 6 0 q3 4 6 0" />
+            <g class="eye"><circle class="sclera" cx="44" cy="37" r="6.5" /><circle class="pupil" cx="44" cy="37" r="2" /></g>
+            <g class="eye"><circle class="sclera" cx="62" cy="37" r="6.5" /><circle class="pupil" cx="62" cy="37" r="2" /></g>
+            <path class="body" d="M36 52 C36 46 72 45 73 51 C74 59 67 64 55 64 C43 64 35 59 36 52 Z" />
+            <path class="line" d="M48 51 q1 -2 2 0 M60 51 q1 -2 2 0" />
+            <path class="body" d="M44 61 q1 9 5 9 q2 -4 1 -9 Z M61 61 q-1 9 3 9 q3 -2 2 -9 Z" />
+            <path class="line" d="M48 72 l1 7 M47 79 l-2 5 M49 79 l0 6 M50 79 l3 5 M66 72 l-1 7 M64 79 l-2 5 M66 79 l0 6 M67 79 l3 5" />
+          </svg>
+          <span>things I've built</span>
+        </a>
+        <a href="#drawings" data-page="drawings">
+<svg class="critter minimal scribble" viewBox="0 0 100 100" aria-hidden="true">
+            <path class="curl" d="M14 34 c2 -7 9 -9 12 -4 c2 4 -3 7 -5 4" />
+            <path class="curl" d="M42 13 c5 -3 11 0 10 5 c-1 4 -6 3 -5 0" />
+            <path class="curl" d="M68 15 c-3 6 2 11 7 8 c3 -2 1 -6 -2 -4" />
+            <path class="curl" d="M84 33 c6 3 6 10 1 13 c-3 2 -6 -1 -3 -3" />
+            <path class="curl" d="M89 62 c-2 6 -9 8 -12 3 c-1 -3 3 -5 5 -2" />
+            <path class="curl" d="M71 85 c-5 4 -12 2 -11 -3 c1 -3 5 -3 5 0" />
+            <path class="curl" d="M45 91 c-6 1 -10 -4 -7 -8 c2 -2 5 0 4 2" />
+            <path class="curl" d="M21 79 c-5 -3 -6 -10 -1 -12 c3 -1 5 3 2 4" />
+            <path class="curl" d="M10 55 c0 -6 6 -9 10 -6 c3 2 0 6 -3 4" />
+            <path class="curl" d="M27 63 c-3 3 -2 7 2 7" />
+            <path class="curl" d="M70 63 c3 -2 7 0 6 4" />
+            <path class="curl" d="M28 24 c3 -1 5 1 4 3" />
+            <g class="eye" data-r="5">
+              <path class="ink-line lid" d="M33 47 Q36.5 48.6 40 47.8 Q43.5 47 47 47.6" />
+              <g class="open"><path class="ink-line" d="M32.3 45 C32.6 39.5 37 37.6 41 38.1 C45.6 38.7 48.3 42.6 47.8 46.6 C47.3 51 43.6 54 39.6 53.8 C35.4 53.6 32.1 50.2 32.4 46.2 C32.5 45 33 44 33.7 43.2" />
+              <g class="look"><ellipse class="ink-fill" cx="40.5" cy="48.5" rx="2.2" ry="3.3" /></g></g>
+            </g>
+            <g class="eye" data-r="5">
+              <path class="ink-line lid" d="M53 47.4 Q57 48.8 61 48 Q65 47.2 69 47.8" />
+              <g class="open"><path class="ink-line" d="M52.3 46 C52.6 40.4 57 37.6 61.5 37.9 C66.5 38.3 70.2 42.3 69.9 47.4 C69.6 52.2 65.6 56 60.8 55.8 C56 55.6 52.2 51.6 52.4 46.8 C52.5 45.6 53 44.6 53.8 43.8" />
+              <g class="look"><circle class="ink-fill" cx="59" cy="50" r="2.4" /></g></g>
+            </g>
+            <path class="mark hatch" d="M43 61 L47 70 M46 60 L50 69 M49 59.5 L53 68 M52 59.5 L55.5 66.5" />
+          </svg>
+          <span>drawings</span>
+        </a>
+      </nav>
+
       <!-- Home -->
-      <div id="page-home" class="page-content">
-        <div class="section-label">about me</div>
+      <div id="page-about" class="page-content">
         <div class="about-text">
           <p>
             Hi! My name is Ethan. I work on the Internal AI team at Ramp. Before that, I spent some time at Battery Ventures, where I spent much of my time sourcing -_-
             I graduated from Dartmouth as a double major in Economics and Computer Science, where I also played Rugby.
-          </p>
-          <p>
-            I also like to <span class="draw-link" role="button" tabindex="0">draw</span>!<button class="close-all" type="button" hidden>× close all</button>
           </p>
           <p>
             I deleted LinkedIn (the app) a while ago, but you can reach me at ethan [at] echild.cc
@@ -34,41 +121,68 @@
       </div>
 
       <!-- Built -->
+      <!-- Drawings -->
+      <div id="page-drawings" class="page-content" hidden>
+        <div class="sketch-grid"></div>
+      </div>
+
       <div id="page-built" class="page-content" hidden>
-        <div class="section-label">things I've built</div>
         <ul class="built-list">
           <li>
-            <span class="impact">Saved $3M (and counting)!</span>
             <span class="label">AI email writing agent for Ramp AEs</span>
+            <span class="impact">Saved $3M (and counting)!</span>
           </li>
           <li>
-            <span class="impact">Adopted as the primary means of escalation</span>
             <span class="label">Escalation path from Ramp's CX team to the Post-Sales (AM) team</span>
+            <span class="impact">Adopted as the primary means of escalation</span>
           </li>
           <li>
-            <span class="impact">Trained a Transformer Model to play Checkers</span>
             <span class="label">Checkers Transformer</span>
+            <span class="impact">Trained a Transformer Model to play Checkers</span>
           </li>
           <li>
-            <span class="impact">Trained a Transformer to generate video game music MIDI files</span>
             <span class="label">Video Game Music MIDI Transformer</span>
+            <span class="impact">Trained a Transformer to generate video game music MIDI files</span>
           </li>
           <li>
-            <span class="impact">Got runner up!</span>
             <span class="label">Built an AI SDR co-pilot for the Ramp Hackathon</span>
+            <span class="impact">Got runner up!</span>
           </li>
           <li>
-            <span class="impact">So much sourcing. Lots of companies.</span>
             <span class="label">Sourced a lot of companies for Battery</span>
+            <span class="impact">So much sourcing. Lots of companies.</span>
           </li>
         </ul>
       </div>
 
-      <nav class="social">
+      <div class="ground" aria-hidden="true"></div>
+      <footer class="social">
+        <svg class="critter minimal robot" style="--crit: var(--p2)" viewBox="0 0 100 100" aria-hidden="true">
+          <path class="outline" d="M26 40 C26 31 33 26 40 26 M56 26 C66 26 74 31 75 42 M24 47 C22 60 24 74 28 84 M76 50 C78 62 76 74 72 82 M34 92 C46 96 60 94 70 88" />
+          <path class="post" d="M38.5 30 L38.5 14 M58 30 L58 15" />
+          <path class="feature thin" d="M33 6 L39 3 L45 5 L45 12 L39 15 L33 12 Z M33 6 L39 9 L45 5 M39 9 L39 15" />
+          <path class="feature thin" d="M55 9 L61 9 L61 15 L55 15 Z" />
+          <path class="spark" d="M45 9 l2 -3 l2 4 l2 -4 l2 4 l2 -3" />
+          <path class="ink-line" d="M27 50 L33 45 L42 46 L45 52 L42 59 L32 60 L27 55 Z M52 50 L58 47 L67 48 L69 55 L66 61 L56 61 L52 56 Z" />
+          <path class="ink-line" d="M45 51 Q48.5 48 52 51 M69 54 L78 52" />
+          <path class="mark hatch" d="M33 50 l2 5 M35.5 49.5 l2 5 M38 49.5 l2 5 M58 52 l2 5 M60.5 51.5 l2 5 M63 51.5 l2 5" />
+          <path class="ink-line" d="M29 69 L45 70 L44 80 L30 79 Z M34.5 69.3 L34.3 79.3 M40 69.6 L39.6 79.6 M29.5 74.2 L44.5 75" />
+        </svg>
+        <svg class="critter minimal stag" style="--crit: var(--p2)" viewBox="0 0 100 100" aria-hidden="true">
+          <path class="feature thin" d="M41 66 C30 60 22 50 23 40 C23.5 35 25 31 27 30 Q30 29.5 29.5 33 C28.5 41 31 51 46 62" />
+          <path class="feature thin" d="M30.6 43.5 C32 40 34 37 37 34.5 Q40.5 33.5 39.5 37 C37.5 39.5 35 43 32.5 47.9" />
+          <path class="feature thin" d="M59 66 C70.5 59.5 78.5 49.5 77.5 39.5 C77 34.5 75.5 30.5 73.5 29.5 Q70.2 29.2 70.6 32.8 C71.6 41 69 51 54 62" />
+          <path class="feature thin" d="M69.4 43.5 C68 40 66.5 36.5 64 33.5 Q60.5 32.5 61 36 C63 39 65 43 67.5 47.9" />
+          <!-- Head turned slightly right: near eye wide, far eye narrow and higher; nose and smile follow. -->
+          <g class="eye" data-r="4"><g class="look"><path class="ink-line fine-eye" transform="translate(41 74) rotate(16) scale(0.7) translate(-41 -74)" d="M35.5 74 C35 70.8 38 69.6 40.3 70.8 C41.4 71.4 42.2 71.3 43.4 70.7 C45.8 69.6 47.6 72 46.6 74.6 C45.6 77.3 42.6 78.2 39.6 77.6 C37.4 77.2 35.9 76 35.5 74 Z" /></g></g>
+          <g class="eye" data-r="4"><g class="look"><path class="ink-line fine-eye" transform="translate(58 71) rotate(10) scale(0.8) translate(-58 -71)" d="M57 66.5 C59 65.6 60.6 67 60.3 69 C60.1 70.2 60.8 71.4 60.6 73 C60.3 75.4 58.2 76.4 56.9 75.3 C55.7 74.3 55.9 72.4 56 70.8 C56.1 69.2 55.4 67.4 57 66.5 Z" /></g></g>
+          <path class="mark" d="M51 81.5 L51.4 84.5 M55.6 80.8 L56 83.8" />
+          <path class="mark" d="M48.5 89.5 Q54 93.5 59 88" />
+        </svg>
         <a class="linkedin" href="https://linkedin.com/in/ethan-child" target="_blank" rel="noopener" aria-label="LinkedIn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <rect width="24" height="24" rx="2" fill="#080808"/>
-            <path fill="#ffffff" d="M6.94 5a2 2 0 1 1-4-.002A2 2 0 0 1 6.94 5zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68z"/>
+            <rect width="24" height="24" rx="2" fill="currentColor"/>
+            <path class="li-in" d="M6.94 5a2 2 0 1 1-4-.002A2 2 0 0 1 6.94 5zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68z"/>
           </svg>
         </a>
         <a href="https://x.com/eboppu" target="_blank" rel="noopener" aria-label="X">
@@ -81,30 +195,125 @@
             <path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.94 0-1.31.47-2.38 1.24-3.22-.13-.31-.54-1.53.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.05.14 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.25 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.49 5.93.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.21.7.82.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/>
           </svg>
         </a>
-      </nav>
+      </footer>
     </div>
   </div>
 
-  <div class="drawings-layer" aria-hidden="true"></div>
+  <div class="scrollbar" aria-hidden="true"><div class="scrollbar-thumb"></div></div>
+
   <div class="lightbox" hidden>
-    <button class="lightbox-close" aria-label="Close">×</button>
-    <button class="lightbox-nav prev" aria-label="Previous drawing">‹</button>
-    <img alt="" />
-    <button class="lightbox-nav next" aria-label="Next drawing">›</button>
+    <button class="lightbox-close" aria-label="Close">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path class="ic-line" d="M4 4 L12 12 M12 4 L4 12" />
+      </svg>
+    </button>
+    <button class="lightbox-nav prev" aria-label="Previous">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path class="ic-line" d="M10 3 L5 8 L10 13" />
+      </svg>
+    </button>
+    <div class="lightbox-figure">
+      <div class="lightbox-peek"></div>
+      <img alt="" />
+    </div>
+    <button class="lightbox-nav next" aria-label="Next">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path class="ic-line" d="M6 3 L11 8 L6 13" />
+      </svg>
+    </button>
     <div class="lightbox-counter" aria-hidden="true"></div>
   </div>
 
   <script>
+    const body = document.body;
     const nav = document.querySelectorAll('.landing-nav a');
     const pages = document.querySelectorAll('.page-content');
+    const PAGES = ['about', 'built', 'drawings'];
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    nav.forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        const page = a.dataset.page;
-        pages.forEach(p => p.hidden = p.id !== 'page-' + page);
-        nav.forEach(n => n.classList.toggle('active', n === a));
+    // ── Door → inside routing ──
+    // States: outside → opening → entering → inside, and back via leaving → closing.
+    let routeSeq = 0;
+    const wait = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
+    const setState = s => body.dataset.state = s;
+
+    function showPage(page) {
+      pages.forEach(p => p.hidden = p.id !== 'page-' + page);
+      nav.forEach(n => {
+        const on = n.dataset.page === page;
+        n.classList.toggle('active', on);
+        if (on) n.setAttribute('aria-current', 'page');
+        else n.removeAttribute('aria-current');
       });
+    }
+
+    async function route(animate = true) {
+      const seq = ++routeSeq;
+      const page = location.hash.slice(1);
+      const state = body.dataset.state;
+
+      if (PAGES.includes(page)) {
+        showPage(page);
+        if (state === 'inside' || state === 'entering') return;
+        if (animate) {
+          setState('opening');
+          await wait(380);
+          if (seq !== routeSeq) return;
+          setState('entering');
+          await wait(800);
+          if (seq !== routeSeq) return;
+        }
+        setState('inside');
+      } else {
+        if (state === 'outside' || state === 'closing') return;
+        if (animate) {
+          setState('leaving');
+          await wait(600);
+          if (seq !== routeSeq) return;
+          setState('closing');
+          await wait(420);
+          if (seq !== routeSeq) return;
+        }
+        setState('outside');
+      }
+    }
+
+    // Anywhere on the composition goes in; the door itself stays the keyboard target.
+    document.querySelector('.scene').addEventListener('click', () => {
+      if (body.dataset.state !== 'outside') return;
+      location.hash = 'about';
+    });
+
+    window.addEventListener('hashchange', () => route());
+    window.addEventListener('popstate', () => route());
+
+    // ── Critter eyes ──
+    // Eyes with a sclera carry every style (see EYE_STYLES in themes.js);
+    // :root[data-eyes] decides which one shows. Eyes don't follow the cursor.
+    const SVGNS = 'http://www.w3.org/2000/svg';
+    const svgEl = (tag, attrs, parent) => {
+      const n = document.createElementNS(SVGNS, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      parent.appendChild(n);
+      return n;
+    };
+
+    document.querySelectorAll('.eye').forEach(eye => {
+      const sclera = eye.querySelector('.sclera');
+      if (!sclera) return;
+      const cx = +sclera.getAttribute('cx');
+      const cy = +sclera.getAttribute('cy');
+      const r = +sclera.getAttribute('r');
+
+      // Bean: solid dark oval with a catchlight, no whites.
+      svgEl('ellipse', { class: 'bean', cx, cy, rx: r * 0.5, ry: r * 0.64 }, eye);
+      svgEl('circle', { class: 'glint', cx: cx - r * 0.17, cy: cy - r * 0.27, r: r * 0.18 }, eye);
+
+      // Pixel: a 2×3 block with one highlight pixel, on a grid of u.
+      const u = r * 0.38;
+      const px = svgEl('g', { class: 'px' }, eye);
+      svgEl('rect', { class: 'k', x: cx - u, y: cy - 1.5 * u, width: 2 * u, height: 3 * u }, px);
+      svgEl('rect', { class: 'w', x: cx - u, y: cy - 1.5 * u, width: u, height: u }, px);
     });
 
     document.querySelectorAll('.built-list li').forEach(li => {
@@ -135,21 +344,6 @@
 
     document.querySelectorAll('.name, .page-content').forEach(wrapLetters);
 
-    // Keep social icons at a consistent vertical position across all tabs
-    function syncPageHeight() {
-      const contentEls = document.querySelectorAll('.page-content');
-      let maxH = 0;
-      contentEls.forEach(p => {
-        const wasHidden = p.hidden;
-        p.hidden = false;
-        maxH = Math.max(maxH, p.offsetHeight);
-        p.hidden = wasHidden;
-      });
-      contentEls.forEach(p => p.style.minHeight = maxH + 'px');
-    }
-    document.fonts.ready.then(syncPageHeight);
-    window.addEventListener('resize', syncPageHeight);
-
     // Key highlight — per-span timeouts fix multi-letter fade-out
     const spanTimeouts = new WeakMap();
     document.addEventListener('keydown', e => {
@@ -164,7 +358,7 @@
       });
     });
 
-    // ── Drawing burst ──
+    // ── Drawings ──
     const drawingSources = [
       'photos/drawing-1.jpeg',
       'photos/drawing-2.jpeg',
@@ -175,9 +369,42 @@
       'photos/drawing-7.jpeg'
     ];
 
-    const drawLink = document.querySelector('.draw-link');
-    const drawingsLayer = document.querySelector('.drawings-layer');
-    const closeAllBtn = document.querySelector('.close-all');
+    // The original sketches each critter was traced from.
+    // Each critter peeks over the top of the sketch it came from.
+    const originSources = [
+      { src: 'photos/origins/horned.jpg', critter: '.landing-nav a[data-page="built"] .critter', crit: 'var(--p2)' },
+      { src: 'photos/origins/antennae.jpg', critter: '.landing-nav a[data-page="about"] .critter', crit: 'var(--p3)' },
+      { src: 'photos/origins/antlers.jpg', critter: '.social .stag', crit: 'var(--p2)' },
+      { src: 'photos/origins/robot.jpg', critter: '.social .robot', crit: 'var(--p2)' },
+      { src: 'photos/origins/scribble.jpg', critter: '.landing-nav a[data-page="drawings"] .critter', crit: 'var(--p3)' },
+    ];
+
+    // One grid: the critters' sketches first, then the rest of the drawings.
+    const sketches = [...originSources, ...drawingSources.map(src => ({ src }))];
+    const sketchGrid = document.querySelector('.sketch-grid');
+
+    sketches.forEach(({ src, critter, crit }, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sketch';
+      b.setAttribute('aria-label', 'Open drawing ' + (i + 1));
+      b.innerHTML = '<img src="' + src + '" alt="" loading="lazy" draggable="false" />';
+      b.addEventListener('click', () => openLightbox(i));
+      if (!critter) {
+        sketchGrid.appendChild(b);
+        return;
+      }
+      // A copy of the finished critter, tucked behind its sketch's top edge.
+      const fig = document.createElement('figure');
+      fig.className = 'origin' + (i % 2 ? ' peek-left' : '');
+      const peek = document.querySelector(critter).cloneNode(true);
+      peek.classList.add('peek');
+      peek.style.setProperty('--crit', crit);
+      fig.appendChild(peek);
+      fig.appendChild(b);
+      sketchGrid.appendChild(fig);
+    });
+
     const lightbox = document.querySelector('.lightbox');
     const lightboxImg = lightbox.querySelector('img');
     const lightboxClose = lightbox.querySelector('.lightbox-close');
@@ -185,159 +412,24 @@
     const lightboxNext = lightbox.querySelector('.lightbox-nav.next');
     const lightboxCounter = lightbox.querySelector('.lightbox-counter');
 
-    function showCloseAll() {
-      if (closeAllBtn.classList.contains('show')) return;
-      closeAllBtn.hidden = false;
-      // Force reflow so the transition runs from the initial state
-      void closeAllBtn.offsetWidth;
-      closeAllBtn.classList.add('show');
-    }
-
-    function hideCloseAll() {
-      if (!closeAllBtn.classList.contains('show')) return;
-      closeAllBtn.classList.remove('show');
-      const onEnd = e => {
-        if (e.propertyName !== 'opacity') return;
-        closeAllBtn.removeEventListener('transitionend', onEnd);
-        closeAllBtn.hidden = true;
-      };
-      closeAllBtn.addEventListener('transitionend', onEnd);
-    }
-
-    function dismissDrawing(wrap) {
-      if (wrap.classList.contains('dismissing')) return;
-      wrap.classList.add('dismissing');
-      wrap.addEventListener('transitionend', () => {
-        wrap.remove();
-        if (!drawingsLayer.querySelector('.drawing')) hideCloseAll();
-      }, { once: true });
-    }
-
-    function clearDrawings() {
-      drawingsLayer.querySelectorAll('.drawing').forEach(d => d.remove());
-    }
-
-    function spawnDrawings() {
-      clearDrawings();
-
-      // Make the close-all button measurable BEFORE positioning drawings, so
-      // we can avoid landing any image on top of it. It's still invisible
-      // (opacity: 0 without the .show class) — only its layout exists.
-      closeAllBtn.hidden = false;
-      void closeAllBtn.offsetWidth;
-
-      const rect = drawLink.getBoundingClientRect();
-      const closeAllRect = closeAllBtn.getBoundingClientRect();
-      const originX = rect.left + rect.width / 2;
-      const originY = rect.top + rect.height / 2;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      // Exclusion zone around the close-all button. Padded by a drawing's
-      // approximate half-size so a drawing's center placed outside this zone
-      // can't have its frame overlap the button.
-      const exclPadX = 110;
-      const exclPadY = 110;
-      const exclLeft = closeAllRect.left - exclPadX;
-      const exclRight = closeAllRect.right + exclPadX;
-      const exclTop = closeAllRect.top - exclPadY;
-      const exclBottom = closeAllRect.bottom + exclPadY;
-
-      drawingSources.forEach((src, i) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'drawing';
-        wrap.innerHTML =
-          '<div class="drawing-frame">' +
-            '<img src="' + src + '" alt="" draggable="false" />' +
-            '<div class="drawing-actions">' +
-              '<button class="drawing-action max" type="button" aria-label="Maximize">' +
-                '<svg viewBox="0 0 16 16"><path d="M3 3h4M3 3v4M13 3H9M13 3v4M3 13h4M3 13v-4M13 13H9M13 13v-4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>' +
-              '</button>' +
-              '<button class="drawing-action close" type="button" aria-label="Remove">' +
-                '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>' +
-              '</button>' +
-            '</div>' +
-          '</div>';
-
-        wrap.style.left = originX + 'px';
-        wrap.style.top = originY + 'px';
-        drawingsLayer.appendChild(wrap);
-
-        // Distribute angles evenly with jitter so they shoot in different directions
-        const baseAngle = (i / drawingSources.length) * Math.PI * 2;
-        const angle = baseAngle + (Math.random() - 0.5) * 0.6;
-        // Distance proportional to viewport, with a minimum to clear the word
-        const minDim = Math.min(vw, vh);
-        const distance = minDim * (0.22 + Math.random() * 0.18);
-        const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance * 0.85;
-        const rot = (Math.random() - 0.5) * 24;
-
-        // Clamp so they stay within the page's black-space border.
-        // Margins are from the drawing's center, so they include ~half a frame
-        // plus the gutter we want to preserve.
-        const sideMargin = 140;
-        const topMargin = 160;
-        const bottomMargin = 220;
-        let clampedDx = Math.max(sideMargin - originX, Math.min(vw - sideMargin - originX, dx));
-        let clampedDy = Math.max(topMargin - originY, Math.min(vh - bottomMargin - originY, dy));
-
-        // If the landing center falls in the close-all exclusion zone, push it
-        // vertically to whichever edge is nearer, then re-clamp to viewport.
-        const cx = originX + clampedDx;
-        let cy = originY + clampedDy;
-        if (cx > exclLeft && cx < exclRight && cy > exclTop && cy < exclBottom) {
-          cy = (cy - exclTop) < (exclBottom - cy) ? exclTop - 1 : exclBottom + 1;
-          cy = Math.max(topMargin, Math.min(vh - bottomMargin, cy));
-          clampedDy = cy - originY;
-        }
-
-        wrap.style.setProperty('--dx', clampedDx + 'px');
-        wrap.style.setProperty('--dy', clampedDy + 'px');
-        wrap.style.setProperty('--rot', rot + 'deg');
-        wrap.style.setProperty('--delay', (i * 35) + 'ms');
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => wrap.classList.add('settled'));
-        });
-
-        wrap.querySelector('.close').addEventListener('click', e => {
-          e.stopPropagation();
-          dismissDrawing(wrap);
-        });
-
-        // Both the explicit maximize button and the image itself open the
-        // gallery at this drawing's position.
-        const open = e => {
-          e.stopPropagation();
-          openLightbox(i);
-        };
-        wrap.querySelector('.max').addEventListener('click', open);
-        wrap.querySelector('img').addEventListener('click', open);
-      });
-
-      showCloseAll();
-    }
-
-    closeAllBtn.addEventListener('click', () => {
-      drawingsLayer.querySelectorAll('.drawing').forEach(dismissDrawing);
-    });
-
-    drawLink.addEventListener('click', spawnDrawings);
-    drawLink.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        spawnDrawings();
-      }
-    });
-
     let lightboxIndex = 0;
 
+    const lightboxPeek = lightbox.querySelector('.lightbox-peek');
+
     function renderLightbox() {
+      const item = sketches[lightboxIndex];
       lightboxImg.classList.remove('loaded');
-      lightboxImg.src = drawingSources[lightboxIndex];
-      lightboxCounter.textContent =
-        (lightboxIndex + 1) + ' / ' + drawingSources.length;
+      lightboxImg.src = item.src;
+      lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + sketches.length;
+
+      // A critter's sketch gets the critter itself, peeking over the photo.
+      lightboxPeek.replaceChildren();
+      if (item.critter) {
+        const peek = document.querySelector(item.critter).cloneNode(true);
+        peek.classList.add('peek');
+        peek.style.setProperty('--crit', item.crit);
+        lightboxPeek.appendChild(peek);
+      }
     }
 
     lightboxImg.addEventListener('load', () => lightboxImg.classList.add('loaded'));
@@ -350,7 +442,7 @@
     }
 
     function stepLightbox(dir) {
-      const n = drawingSources.length;
+      const n = sketches.length;
       lightboxIndex = (lightboxIndex + dir + n) % n;
       renderLightbox();
     }
@@ -375,6 +467,157 @@
       else if (e.key === 'ArrowLeft') stepLightbox(-1);
       else if (e.key === 'ArrowRight') stepLightbox(1);
     });
+
+    // ── Peeking footer ──
+    // Floats up when the pointer comes within reach of the bottom edge.
+    const footer = document.querySelector('.social');
+    document.addEventListener('pointermove', e => {
+      footer.classList.toggle('up', e.clientY > innerHeight - 130);
+    });
+    document.documentElement.addEventListener('pointerleave', () => footer.classList.remove('up'));
+
+    // ── Scrollbar ──
+    // Our own bar in place of the browser's: faint at rest, brighter while
+    // scrolling or hovered; drag the thumb or click the track to move.
+    const bar = document.querySelector('.scrollbar');
+    const thumb = bar.querySelector('.scrollbar-thumb');
+    let barTimer = 0;
+
+    function updateScrollbar() {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.classList.toggle('none', max <= 1 || body.dataset.state !== 'inside');
+      if (max <= 1) return;
+      const track = bar.clientHeight;
+      const size = Math.max(40, track * innerHeight / document.documentElement.scrollHeight);
+      thumb.style.height = size + 'px';
+      thumb.style.transform = `translateY(${(track - size) * scrollY / max}px)`;
+    }
+
+    window.addEventListener('scroll', () => {
+      updateScrollbar();
+      bar.classList.add('active');
+      clearTimeout(barTimer);
+      barTimer = setTimeout(() => bar.classList.remove('active'), 900);
+    }, { passive: true });
+    window.addEventListener('resize', updateScrollbar);
+    new ResizeObserver(updateScrollbar).observe(document.querySelector('.shell'));
+    new MutationObserver(updateScrollbar).observe(body, { attributes: true, attributeFilter: ['data-state'] });
+
+    thumb.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      thumb.setPointerCapture(e.pointerId);
+      bar.classList.add('dragging');
+      const startY = e.clientY;
+      const startScroll = scrollY;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const range = bar.clientHeight - thumb.offsetHeight;
+      const move = ev => scrollTo(0, startScroll + (ev.clientY - startY) / range * max);
+      const end = () => {
+        bar.classList.remove('dragging');
+        thumb.removeEventListener('pointermove', move);
+      };
+      thumb.addEventListener('pointermove', move);
+      thumb.addEventListener('pointerup', end, { once: true });
+      thumb.addEventListener('pointercancel', end, { once: true });
+    });
+
+    bar.addEventListener('pointerdown', e => {
+      if (e.target !== bar) return;
+      const rect = bar.getBoundingClientRect();
+      const max = document.documentElement.scrollHeight - innerHeight;
+      scrollTo({ top: (e.clientY - rect.top) / rect.height * max, behavior: 'smooth' });
+    });
+
+    // ?embed=critters: just the critters, big, for the eyes comparison page.
+    if (new URLSearchParams(location.search).get('embed') === 'critters') {
+      document.documentElement.classList.add('embed-critters');
+    }
+
+    // ── Door scene ──
+    // Each plane is a slab: a darker edge face under the top face gives it
+    // thickness, and a blurred shadow behind it gives it height. Planes float
+    // on their own rhythm and shift with the pointer by depth; the door and
+    // its frame stay still as the anchor.
+    const DOOR_CENTER = [257, 458];
+    const PIECES = [
+      { pts: [[118,566],[396,564],[414,586],[100,588]], fill: 'p1', depth: 0, edge: [0, 7], still: true },
+      { pts: [[148,348],[366,348],[366,566],[148,566]], fill: 'door', depth: 0, edge: [0, 0], still: true, frame: true },
+      { pts: [[414,362],[496,364],[398,556],[352,556],[352,456]], fill: 'p3', depth: 10, edge: [5, 9] },
+      { pts: [[92,270],[444,266],[504,350],[74,356]], fill: 'p1', depth: 7, edge: [4, 10] },
+      { pts: [[154,142],[412,140],[408,240],[156,240]], fill: 'p1', depth: 13, edge: [3, 20] },
+      { pts: [[272,108],[340,86],[494,190],[480,272]], fill: 'p2', depth: 20, edge: [5, 10] },
+      { pts: [[58,96],[140,82],[152,168],[50,180]], fill: 'p3', depth: 16, edge: [4, 9] },
+    ];
+
+    function buildScene() {
+      const NS = 'http://www.w3.org/2000/svg';
+      const art = document.querySelector('.scene-art');
+      const shadows = art.querySelector('.shadows');
+      const pieces = art.querySelector('.pieces');
+      const el = (tag, attrs, parent) => {
+        const n = document.createElementNS(NS, tag);
+        Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+        parent.appendChild(n);
+        return n;
+      };
+      const pts = (list, [dx, dy] = [0, 0]) => list.map(([x, y]) => (x + dx) + ',' + (y + dy)).join(' ');
+
+
+      // Deterministic jitter so the float rhythm is the same on every visit.
+      let seed = 11;
+      const rand = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+
+      PIECES.forEach((p, i) => {
+        const cx = p.pts.reduce((s, q) => s + q[0], 0) / p.pts.length;
+        const cy = p.pts.reduce((s, q) => s + q[1], 0) / p.pts.length;
+        // Still pieces (the door's frame and floor) never spread or fly in.
+        const len = p.still ? Infinity : Math.hypot(cx - DOOR_CENTER[0], cy - DOOR_CENTER[1]) || 1;
+        const vars = [
+          `--depth:${p.depth}`,
+          `--ux:${((cx - DOOR_CENTER[0]) / len).toFixed(3)}`,
+          `--uy:${((cy - DOOR_CENTER[1]) / len).toFixed(3)}`,
+          `--ad:${i * 60}ms`,
+          `--dur:${(6 + rand() * 5).toFixed(2)}s`,
+          `--delay:${(-rand() * 11).toFixed(2)}s`,
+          `--tdur:${(9 + rand() * 7).toFixed(2)}s`,
+          `--tdelay:${(-rand() * 16).toFixed(2)}s`,
+          `--fx:${((rand() - 0.5) * 3).toFixed(1)}px`,
+          `--fy:${(-2.5 - rand() * 2.5).toFixed(1)}px`,
+          `--fr:${((rand() - 0.5) * 0.5).toFixed(2)}deg`,
+        ].join(';');
+        const cls = p.still ? 'still' : 'float';
+
+        if (p.depth) {
+          const lift = [10 + p.depth * 0.6, 14 + p.depth * 0.9];
+          const s = el('g', { class: 'piece shadow', style: vars }, shadows);
+          const sa = el('g', { class: 'arrive' }, s);
+          const sf = el('g', { class: cls }, sa);
+          el('polygon', { points: pts(p.pts, lift), filter: 'url(#soft-shadow)' }, sf);
+        }
+
+        const g = el('g', { class: 'piece', style: vars }, pieces);
+        const a = el('g', { class: 'arrive' }, g);
+        const f = el('g', { class: cls }, a);
+        if (p.edge[0] || p.edge[1]) {
+          el('polygon', { points: pts(p.pts, p.edge), class: 'edge', style: `--c:var(--${p.fill})` }, f);
+        }
+        el('polygon', {
+          points: pts(p.pts),
+          class: p.frame ? 'face frame' : 'face',
+          style: `--c:var(--${p.fill})`,
+        }, f);
+      });
+    }
+    buildScene();
+
+    // ── Initial state ──
+    // Deep links (#about, #built) skip the door; otherwise the planes fly in and settle.
+    if (PAGES.includes(location.hash.slice(1))) {
+      route(false);
+    } else if (!reduceMotion) {
+      body.classList.add('assembling');
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => body.classList.remove('no-anim')));
   </script>
 </body>
 </html>

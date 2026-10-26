@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eyes — Ethan Child</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter+Tight:wght@400;500;600&display=swap" />
+  <script>window.NO_SETTINGS_APPLY = true;</script>
+  <script src="settings.js"></script>
+  <link rel="stylesheet" href="lab.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Who's behind the door?</h1>
+    </div>
+    <p>
+      Three ways to draw the horned critter's eyes. Each preview is live: hover the
+      tabs to wake the critters up.
+    </p>
+    <a class="back" href="index.html">← back to the site</a>
+  </header>
+
+  <main class="grid"></main>
+
+  <script>
+    const grid = document.querySelector('.grid');
+    let picked = null;
+    try { picked = localStorage.getItem('eyes'); } catch (e) {}
+    picked = picked || EYE_STYLES[0].id;
+
+    EYE_STYLES.forEach(style => {
+      const card = document.createElement('article');
+      card.className = 'card' + (style.id === picked ? ' picked' : '');
+      card.innerHTML = `
+        <div class="frame">
+          <iframe src="index.html?eyes=${style.id}&embed=critters#about" style="width:640px;height:480px" title="${style.name} eyes preview" loading="lazy"></iframe>
+        </div>
+        <div class="meta">
+          <div class="title-row">
+            <h2>${style.name}</h2>
+          </div>
+          <p class="note">${style.note}</p>
+          <div class="actions">
+            <a href="index.html?eyes=${style.id}">open</a>
+            <button type="button" data-pick>${style.id === picked ? 'using this' : 'use this'}</button>
+          </div>
+        </div>`;
+      card.querySelector('[data-pick]').addEventListener('click', () => {
+        applyEyes(style.id, { persist: true });
+        location.reload();
+      });
+      grid.appendChild(card);
+    });
+
+    const ro = new ResizeObserver(entries => {
+      entries.forEach(e => e.target.style.setProperty('--s', e.contentRect.width / 640));
+    });
+    document.querySelectorAll('.frame').forEach(f => ro.observe(f));
+  </script>
+</body>
+</html>

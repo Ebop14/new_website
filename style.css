@@ -1,61 +1,292 @@
-@font-face {
-  font-family: 'Space Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('fonts/spacemono-400.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Space Mono';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('fonts/spacemono-700.woff2') format('woff2');
-}
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* The palette: Garden, a split-complementary scheme (deep green; coral and plum). */
 :root {
-  --bg-start: #080808;
-  --bg-end: #131313;
-  --text: #f0f0f0;
-  --text-muted: rgba(240, 240, 240, 0.45);
+  --bg: #1f3d34;
+  --ink: #f1efe6;
+  --muted: #a7b8ad;
+  --p1: #2f6252;
+  --p2: #ff7f61;
+  --p3: #b565a7;
+  --p4: #18322b;
+  --line: #f1efe6;
+  --door: #ff7f61;
+  --light: #ffeadf;
+  --accent: #ff7f61;
+  --void: color-mix(in srgb, var(--ink) 85%, var(--p1));
+
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter Tight', system-ui, -apple-system, sans-serif;
   --gutter: 56px;
-  --max-width: 780px;
+  --max-width: 760px;
 }
 
 html, body {
-  height: 100%;
-  background: #080808;
+  background: var(--bg);
 }
 
 body {
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 60%, #0e0e10 100%);
-  color: var(--text);
-  font-family: 'Space Mono', monospace;
+  color: var(--ink);
+  font-family: var(--sans);
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   line-height: 1.7;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* ── Noise overlay ── */
-body::before {
-  content: '';
+/* Highlighted text takes the palette's accent instead of the browser's blue. */
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+body:not([data-state="inside"]) {
+  overflow: hidden;
+}
+
+.no-anim *, .no-anim *::before, .no-anim *::after {
+  transition: none !important;
+}
+
+/* ════════════ Entry: the door ════════════ */
+
+.entry {
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.028;
-  pointer-events: none;
-  z-index: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  background: var(--bg);
+  transition: opacity 0.45s ease, background-color 0.4s ease;
 }
 
-/* ── Layout ── */
+.entry::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.entry-name {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  transition: opacity 0.3s ease;
+}
+
+.scene {
+  --spread: 0;
+  position: relative;
+  width: min(90vw, calc(72svh * 560 / 600));
+  aspect-ratio: 560 / 600;
+  perspective: 800px;
+  /* The doorway's center, so zooming in carries you through it. */
+  transform-origin: 45.89% 69.67%;
+  transition: transform 0.7s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.scene-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── Slabs ── */
+.face {
+  fill: var(--c);
+  transition: fill 0.4s ease;
+}
+
+.face.frame {
+  fill: color-mix(in srgb, var(--door) 62%, var(--ink));
+}
+
+.edge {
+  fill: color-mix(in srgb, var(--c) 64%, var(--ink));
+  transition: fill 0.4s ease;
+}
+
+/* Mixed toward black, not the text color: on dark palettes the text color is
+   light, which turned these shadows into a glow. */
+.shadow polygon {
+  fill: color-mix(in srgb, color-mix(in srgb, var(--p1) 35%, #000) 45%, transparent);
+}
+
+/* Spread (door hover) lives on the outer group; shadows sit on the wall, so
+   they move less. The planes never follow the cursor. */
+.piece {
+  transform: translate(
+    calc(var(--spread) * var(--ux) * 14px),
+    calc(var(--spread) * var(--uy) * 14px));
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.piece.shadow {
+  transform: translate(
+    calc(var(--spread) * var(--ux) * 6px),
+    calc(var(--spread) * var(--uy) * 6px));
+}
+
+/* Drift and tilt run as two separate animations (on the individual `translate`
+   and `rotate` properties) with unrelated periods, so no plane ever repeats
+   the same motion in lockstep. */
+.float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    drift var(--dur) ease-in-out var(--delay) infinite alternate,
+    tilt var(--tdur) ease-in-out var(--tdelay) infinite alternate;
+}
+
+.shadow .float {
+  animation: shadow-drift var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes drift {
+  to { translate: var(--fx) var(--fy); }
+}
+
+@keyframes tilt {
+  from { rotate: calc(var(--fr) * -1); }
+  to { rotate: var(--fr); }
+}
+
+/* As a plane rises, its shadow tightens and fades a little. */
+@keyframes shadow-drift {
+  to { translate: calc(var(--fx) * 0.3) 1.5px; scale: 0.98; opacity: 0.82; }
+}
+
+/* The whole composition is the hover target, so the door swinging away from
+   the cursor can't flicker the hover off. */
+[data-state="outside"] .scene:hover,
+[data-state="outside"] .scene:has(.door:focus-visible) { --spread: 1; }
+
+[data-state="outside"] .scene { cursor: pointer; }
+[data-state="opening"] .scene { --spread: 3; }
+
+/* First visit: planes fly in from outside the composition and settle. */
+.assembling .arrive {
+  animation: arrive 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.12) var(--ad) both;
+}
+
+.assembling .doorway,
+.assembling .door {
+  animation: fade-in 0.6s ease 0.45s both;
+}
+
+@keyframes arrive {
+  from {
+    transform: translate(calc(var(--ux) * 90px), calc(var(--uy) * 90px)) scale(0.92);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in { from { opacity: 0; } }
+
+/* Doorway (behind the door) and the door — both sit on the drawing's door rect. */
+.doorway,
+.door {
+  position: absolute;
+  left: 28.571%;
+  top: 53%;
+  width: 34.643%;
+  height: 33.333%;
+}
+
+.doorway {
+  background: var(--light);
+  overflow: hidden;
+}
+
+.door {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transform-origin: right center;
+  transition: transform 0.45s cubic-bezier(0.5, 0, 0.15, 1);
+}
+
+.door svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.door-face {
+  fill: var(--door);
+  transition: fill 0.4s ease;
+}
+
+.door-panel {
+  fill: color-mix(in srgb, var(--door) 80%, var(--ink));
+  transition: fill 0.4s ease;
+}
+
+.knob {
+  fill: var(--p3);
+  transition: fill 0.4s ease;
+}
+
+.door:focus-visible { outline: none; }
+.door:focus-visible .door-face { fill: var(--accent); }
+
+[data-state="outside"] .scene:hover .door,
+[data-state="outside"] .door:focus-visible {
+  transform: rotateY(-42deg);
+}
+
+[data-state="opening"] .door,
+[data-state="entering"] .door,
+[data-state="inside"] .door,
+[data-state="leaving"] .door {
+  transform: rotateY(-100deg);
+}
+
+[data-state="entering"] .scene,
+[data-state="inside"] .scene {
+  transform: scale(9);
+}
+
+[data-state="opening"] .entry-name,
+[data-state="entering"] .entry-name,
+[data-state="inside"] .entry-name,
+[data-state="leaving"] .entry-name {
+  opacity: 0;
+}
+
+[data-state="entering"] .entry {
+  opacity: 0;
+  transition-delay: 0.4s;
+}
+
+[data-state="inside"] .entry {
+  opacity: 0;
+  visibility: hidden;
+}
+
+body:not([data-state="outside"]) .entry {
+  pointer-events: none;
+}
+
+/* ════════════ Inside ════════════ */
+
 .shell {
   position: relative;
   z-index: 1;
@@ -65,13 +296,25 @@ body::before {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+[data-state="entering"] .shell {
+  opacity: 1;
+  transition-delay: 0.45s;
+}
+
+[data-state="inside"] .shell {
+  opacity: 1;
 }
 
 .landing {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 22vh;
+  /* Fixed gap under the last line of text, clear of the peeking footer. */
+  padding: 12vh 0 140px;
 }
 
 /* ── Name letter highlight ── */
@@ -80,76 +323,281 @@ body::before {
 }
 
 .nl.lit {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--accent);
   transition: color 0.1s ease;
 }
 
 /* ── Name ── */
 .name {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 700;
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
-  color: #fff;
-  margin-bottom: 28px;
+  margin-bottom: 36px;
 }
 
-/* ── Landing nav ── */
+/* ── Critters ── */
+.critter {
+  display: block;
+  overflow: visible;
+}
+
+.critter .body {
+  fill: var(--crit, var(--p3));
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  transition: fill 0.4s ease;
+}
+
+.critter .line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.critter .fine {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.eye .sclera {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+}
+
+.critter .pupil,
+.eye .pupil { fill: var(--ink); }
+
+/* ── Minimal critters: no body, just features. Antennae take the palette color. ── */
+.critter.minimal .feature {
+  fill: none;
+  stroke: color-mix(in srgb, var(--crit) 55%, var(--ink));
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.critter.minimal .feature-fill {
+  fill: color-mix(in srgb, var(--crit) 55%, var(--ink));
+}
+
+.critter.minimal .tick,
+.critter.minimal .mark {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+.critter.minimal .mark { stroke-width: 2.6; }
+.critter.minimal .feature.thin { stroke-width: 2.2; }
+
+.critter.minimal .ink-line.fine-eye { stroke-width: 1.8; }
+
+.critter.minimal .curl {
+  fill: none;
+  stroke: color-mix(in srgb, var(--crit) 55%, var(--ink));
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.critter.minimal .mark.hatch { stroke-width: 1.6; opacity: 0.8; }
+
+/* Robot (footer): dark antenna posts, a spark between them, a loose head. */
+.critter.minimal .post {
+  fill: none;
+  stroke: color-mix(in srgb, var(--crit) 40%, var(--ink));
+  stroke-width: 4.4;
+  stroke-linecap: round;
+}
+
+.critter.minimal .spark {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.critter.minimal .outline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.critter.minimal .ink-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.critter.minimal .ink-fill { fill: var(--ink); }
+
+/* ── Eye styles: every eye carries all of them; :root[data-eyes] picks one. ── */
+.eye .pupil,
+.eye .bean,
+.eye .glint,
+.eye .px { display: none; }
+
+[data-eyes="stare"] .eye .pupil,
+[data-eyes="bean"] .eye .bean,
+[data-eyes="bean"] .eye .glint,
+[data-eyes="pixel"] .eye .px { display: inline; }
+
+.eye .sclera { opacity: 0; }
+[data-eyes="stare"] .eye .sclera { opacity: 1; }
+
+.eye .bean { fill: var(--ink); }
+.eye .glint { fill: #fff; }
+.eye .px { shape-rendering: crispEdges; }
+.eye .px .k { fill: var(--ink); }
+.eye .px .w { fill: #fff; }
+
+.critter .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s ease;
+}
+
+/* ── Landing nav: critters as tabs. Inactive ones sleep. ── */
 .landing-nav {
   display: flex;
-  flex-direction: row;
-  gap: 24px;
-  margin-bottom: 16px;
+  gap: 32px;
+  margin-bottom: 40px;
 }
 
 .landing-nav a {
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: lowercase;
-  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
   text-decoration: none;
   transition: color 0.2s;
-  width: fit-content;
 }
+
+.landing-nav a:nth-child(1) { --crit: var(--p3); }
+.landing-nav a:nth-child(2) { --crit: var(--p2); }
+.landing-nav a:nth-child(3) { --crit: var(--p3); }
+
+.landing-nav .critter {
+  width: 64px;
+  height: 64px;
+  transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.landing-nav a span {
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.landing-nav a:not(.active) .eye {
+  transform: scaleY(0.12);
+}
+
+.landing-nav a:not(.active) .pupil {
+  opacity: 0;
+}
+
+.landing-nav a:hover .eye { transform: none; }
+.landing-nav a:hover .pupil { opacity: 1; }
 
 .landing-nav a:hover,
 .landing-nav a.active {
-  color: var(--text);
+  color: var(--ink);
 }
 
-/* ── Back link ── */
-.back {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  text-decoration: none;
-  margin-bottom: 48px;
-  display: inline-block;
-  transition: color 0.2s;
+.landing-nav a.active span {
+  border-bottom-color: var(--crit);
 }
 
-.back:hover {
-  color: var(--text);
+.landing-nav a:hover .critter,
+.landing-nav a.active .critter {
+  transform: translateY(-3px);
+}
+
+.landing-nav a.active .eye {
+  animation: blink 5s infinite;
+}
+
+.landing-nav a:nth-child(2).active .eye {
+  animation-delay: 1.7s;
+}
+
+/* Critters idle-float. Uses the individual `translate` property so it stacks
+   with the hover lift on `transform`. */
+.landing-nav .critter,
+.stag,
+.robot {
+  animation: bob 3.2s ease-in-out infinite alternate;
+}
+
+.landing-nav a:nth-child(2) .critter { animation-duration: 3.7s; animation-delay: -1.4s; }
+/* Footer pair: the robot, then the stag. */
+.stag {
+  width: 60px;
+  height: 60px;
+  margin-right: 4px;
+  animation-duration: 3.5s;
+  animation-delay: -2s;
+}
+
+.robot {
+  width: 60px;
+  height: 60px;
+  margin: 0 -2px 0 -8px;
+  animation-duration: 4.3s;
+  animation-delay: -0.6s;
+}
+
+@keyframes bob {
+  from { translate: 0 0; }
+  to { translate: 0 -2.5px; }
+}
+
+/* Scribble critter: asleep, its eyes are flat lines rather than squashed circles. */
+.scribble .lid,
+.scribble .open {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.scribble .lid { opacity: 0; }
+
+.landing-nav a:not(.active) .scribble .eye { transform: none; }
+.landing-nav a:not(.active) .scribble .lid { opacity: 1; }
+.landing-nav a:not(.active) .scribble .open { opacity: 0; transform: scaleY(0.15); }
+.landing-nav a:hover .scribble .lid { opacity: 0; }
+.landing-nav a:hover .scribble .open { opacity: 1; transform: none; }
+
+@keyframes blink {
+  0%, 94%, 100% { transform: none; }
+  96% { transform: scaleY(0.1); }
 }
 
 /* ── Page content ── */
 .page-content {
-  max-width: 560px;
+  max-width: 580px;
 }
 
-.section-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: lowercase;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-}
-
-/* ── About ── */
 .about-text p {
-  font-size: 0.95rem;
-  color: rgba(240,240,240,0.82);
-  line-height: 1.85;
+  font-size: 1.05rem;
+  line-height: 1.8;
   margin-bottom: 1.2em;
 }
 
@@ -160,64 +608,87 @@ body::before {
 /* ── Built list ── */
 .built-list {
   list-style: none;
-  padding: 0;
 }
 
 .built-list li {
-  font-size: 0.95rem;
-  line-height: 1.85;
-  padding-left: 1.4em;
   position: relative;
-  cursor: default;
-  margin-bottom: 2em;
+  padding-left: 26px;
+  margin-bottom: 1.6em;
+  display: flex;
+  flex-direction: column;
 }
 
 .built-list li::before {
-  content: '—';
+  content: '';
   position: absolute;
   left: 0;
-  color: var(--text-muted);
+  top: 0.55em;
+  width: 10px;
+  height: 10px;
+  background: var(--p1);
+  transform: rotate(12deg);
 }
 
+.built-list li:nth-child(3n+2)::before { background: var(--p2); }
+.built-list li:nth-child(3n)::before { background: var(--p3); }
+
 .built-list .label {
-  color: rgba(240,240,240,0.82);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .built-list .impact {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 1.4em;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(3px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-}
-
-.built-list li:hover .impact,
-.built-list li.revealed .impact {
-  opacity: 1;
-  transform: translateY(0);
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 /* ── Social links ── */
+/* The footer peeks up from the bottom edge, half cut off, and floats into
+   view when the pointer comes near the bottom (or anything in it has focus). */
 .social {
+  position: fixed;
+  z-index: 25;
+  bottom: -44px;
+  left: max(var(--gutter), calc((100vw - var(--max-width)) / 2 + var(--gutter)));
   display: flex;
   gap: 16px;
   align-items: center;
-  margin-top: 48px;
+  padding: 8px 0;
+  transition: transform 0.55s cubic-bezier(0.25, 1.4, 0.5, 1);
+}
+
+.social.up,
+.social:focus-within {
+  transform: translateY(-26px);
+}
+
+/* No hover on touch screens: keep the footer in the page, fully visible. */
+@media (hover: none) {
+  .social {
+    position: static;
+    margin-top: 48px;
+  }
+
+  .social a {
+    align-self: center;
+    margin-top: 0;
+  }
+
+  .landing { padding-bottom: 96px; }
 }
 
 .social a {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  /* Ride near the top of the footer so they show while it rests cut off. */
+  align-self: flex-start;
+  margin-top: 6px;
+  color: var(--ink);
   text-decoration: none;
-  opacity: 0.7;
+  opacity: 0.9;
   transition: opacity 0.2s, transform 0.15s;
 }
 
@@ -226,170 +697,195 @@ body::before {
   transform: translateY(-1px);
 }
 
-.social svg {
+.social a svg {
   width: 20px;
   height: 20px;
   fill: currentColor;
 }
 
+.social .li-in { fill: var(--bg); }
 
-/* ── Draw link ── */
-.draw-link {
-  cursor: pointer;
-  color: var(--text);
-  border-bottom: 1px dashed rgba(240, 240, 240, 0.45);
-  padding-bottom: 1px;
-  transition: border-color 0.2s ease, color 0.2s ease;
-  user-select: none;
-}
-
-.draw-link:hover,
-.draw-link:focus-visible {
-  border-bottom-color: var(--text);
-  outline: none;
-}
-
-/* ── Close-all button ── */
-.close-all {
-  font-family: inherit;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-  background: none;
-  border: none;
-  padding: 0;
-  margin-left: 14px;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
-}
-
-.close-all.show {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.close-all:hover,
-.close-all:focus-visible {
-  color: var(--text);
-  outline: none;
-}
-
-/* ── Drawings layer ── */
-.drawings-layer {
+/* ── Ground: a tinted band the footer critters stand in, so content
+   scrolling past fades out beneath them instead of colliding. ── */
+.ground {
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.drawing {
-  position: fixed;
-  top: 0;
+  z-index: 24;
   left: 0;
-  pointer-events: auto;
-  transform: translate(-50%, -50%) scale(0.15) rotate(0deg);
-  opacity: 0;
-  transition:
-    transform 0.85s cubic-bezier(0.18, 0.9, 0.32, 1.1) var(--delay, 0ms),
-    opacity 0.5s ease var(--delay, 0ms);
-  will-change: transform, opacity;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--bg) 0%, transparent) 0%,
+    color-mix(in srgb, var(--p4) 45%, var(--bg)) 62%,
+    color-mix(in srgb, var(--p4) 60%, var(--bg)) 100%);
 }
 
-.drawing.settled {
-  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot));
+@media (hover: none) {
+  .ground { display: none; }
+}
+
+/* ── Scrollbar: ours, not the browser's ── */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar {
+  position: fixed;
+  z-index: 35;
+  top: 18px;
+  bottom: 18px;
+  right: 16px;
+  width: 16px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+}
+
+.scrollbar.none { display: none; }
+
+/* Touch screens keep their own native scroll indicator; ours would sit on the text. */
+@media (hover: none) {
+  html { scrollbar-width: auto; }
+  html::-webkit-scrollbar { display: initial; }
+  .scrollbar { display: none; }
+}
+
+.scrollbar.active,
+.scrollbar.dragging,
+.scrollbar:hover {
   opacity: 1;
 }
 
-.drawing.dismissing {
-  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 40px)) scale(0.6) rotate(var(--rot));
-  opacity: 0;
-  transition:
-    transform 0.35s ease,
-    opacity 0.35s ease;
+/* Hollow pill: an outline in the accent color, no fill. */
+.scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  right: 2px;
+  border-radius: 999px;
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--accent) 80%, transparent);
+  cursor: grab;
+  transition: left 0.2s ease, right 0.2s ease, border-color 0.2s ease;
 }
 
-.drawing-frame {
-  position: relative;
-  width: 180px;
-  padding-top: 44px;
-  border-radius: 4px;
+.scrollbar:hover .scrollbar-thumb,
+.scrollbar.dragging .scrollbar-thumb {
+  left: 0;
+  right: 0;
+  border-color: var(--accent);
+}
+
+.scrollbar.dragging .scrollbar-thumb { cursor: grabbing; }
+
+/* ── Drawings ── */
+#page-drawings {
+  max-width: none;
+}
+
+.sketch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.origin {
+  margin: 0;
+}
+
+/* Room above every row for a critter to peek over its sketch. */
+#page-drawings .sketch-grid {
+  row-gap: 72px;
+  margin-top: 64px;
+}
+
+.origin { position: relative; }
+.origin .sketch { position: relative; z-index: 1; }
+
+/* The critter sits behind the photo with just its head over the top edge,
+   and pops up a little when its sketch is hovered. */
+.origin .peek {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 10%;
+  width: 46%;
+  height: auto;
+  aspect-ratio: 1;
+  margin: 0;
+  animation: none;
+  transform: translateY(-42%) rotate(5deg);
+  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+  pointer-events: none;
+}
+
+.origin.peek-left .peek {
+  right: auto;
+  left: 10%;
+  transform: translateY(-42%) rotate(-5deg);
+}
+
+/* Minimal critters keep their faces low in the drawing, so they rise further. */
+.origin .peek.minimal { transform: translateY(-60%) rotate(5deg); }
+.origin.peek-left .peek.minimal { transform: translateY(-60%) rotate(-5deg); }
+
+.origin:hover .peek,
+.origin:focus-within .peek {
+  transform: translateY(-62%) rotate(-2deg);
+}
+
+.origin.peek-left:hover .peek,
+.origin.peek-left:focus-within .peek {
+  transform: translateY(-62%) rotate(2deg);
+}
+
+.origin:hover .peek.minimal,
+.origin:focus-within .peek.minimal { transform: translateY(-86%) rotate(-2deg); }
+.origin.peek-left:hover .peek.minimal,
+.origin.peek-left:focus-within .peek.minimal { transform: translateY(-86%) rotate(2deg); }
+
+.sketch {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: #131313;
-  box-shadow:
-    0 18px 40px -16px rgba(0, 0, 0, 0.7),
-    0 2px 6px -2px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 4px;
+  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
-.drawing-frame:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 26px 50px -16px rgba(0, 0, 0, 0.8),
-    0 4px 10px -2px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.drawing-frame img {
+.sketch img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   user-select: none;
   -webkit-user-drag: none;
-  cursor: zoom-in;
 }
 
-.drawing-actions {
-  position: absolute;
-  top: 11px;
-  right: 8px;
-  display: flex;
-  gap: 4px;
-  opacity: 0;
-  transform: translateY(-2px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+/* No shadows or glow on photos: hovering just lifts them. */
+.sketch:hover,
+.sketch:focus-visible {
+  transform: translateY(-3px);
 }
 
-.drawing-frame:hover .drawing-actions,
-.drawing-frame:focus-within .drawing-actions {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.drawing-action {
-  width: 22px;
-  height: 22px;
-  border: none;
-  border-radius: 3px;
-  background: rgba(8, 8, 8, 0.75);
-  color: #f0f0f0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.drawing-action:hover {
-  background: rgba(8, 8, 8, 0.95);
-}
-
-.drawing-action svg {
-  width: 12px;
-  height: 12px;
-  display: block;
+.sketch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 /* ── Lightbox ── */
 .lightbox {
   position: fixed;
   inset: 0;
-  z-index: 10;
-  background: rgba(8, 8, 8, 0);
+  z-index: 40;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -404,17 +900,24 @@ body::before {
 
 .lightbox.open {
   opacity: 1;
-  background: rgba(8, 8, 8, 0.88);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
 
+/* The photo, with room above it for a critter to peek over the top. */
+.lightbox-figure {
+  position: relative;
+  display: flex;
+  margin-top: 6vh;
+}
+
 .lightbox img {
-  max-width: 100%;
-  max-height: 100%;
+  position: relative;
+  z-index: 1;
+  max-width: 82vw;
+  max-height: 76vh;
   object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
   opacity: 0;
   transform: scale(0.96);
   transition: transform 0.3s ease, opacity 0.2s ease;
@@ -428,74 +931,138 @@ body::before {
   opacity: 1;
 }
 
-/* Prev / next navigation */
-.lightbox-nav {
+.lightbox-peek .peek {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 64px;
-  border: none;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #f0f0f0;
-  font-size: 30px;
-  line-height: 1;
+  z-index: 0;
+  top: 0;
+  right: 12%;
+  width: clamp(80px, 16vh, 150px);
+  height: auto;
+  aspect-ratio: 1;
+  margin: 0;
+  animation: none;
+  pointer-events: none;
+  transform: translateY(-58%) rotate(5deg);
+  animation: peek-up 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 0.15s both;
+}
+
+.lightbox-peek .peek.minimal {
+  transform: translateY(-82%) rotate(5deg);
+}
+
+@keyframes peek-up {
+  from { translate: 0 45%; }
+}
+
+/* Controls: hollow accent circles with drawn icons. */
+.lightbox-nav,
+.lightbox-close {
+  position: absolute;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--accent);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
-.lightbox-nav:hover {
-  background: rgba(255, 255, 255, 0.16);
+.lightbox-nav:hover,
+.lightbox-close:hover,
+.lightbox-nav:focus-visible,
+.lightbox-close:focus-visible {
+  background: var(--accent);
+  color: var(--bg);
+  outline: none;
+}
+
+.lightbox-nav svg,
+.lightbox-close svg {
+  width: 18px;
+  height: 18px;
+  overflow: visible;
+}
+
+.ic-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lightbox-nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
 }
 
 .lightbox-nav.prev { left: 24px; }
 .lightbox-nav.next { right: 24px; }
+
+.lightbox-close {
+  top: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+}
 
 .lightbox-counter {
   position: absolute;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
 }
 
+/* ── Embed: critters only (eyes.html) ── */
+.embed-critters .name,
+.embed-critters .page-content,
+.embed-critters .social a,
+.embed-critters .ground { display: none; }
+
+.embed-critters .landing {
+  padding: 70px 0 0;
+  align-items: center;
+}
+
+.embed-critters .landing-nav { gap: 90px; margin-bottom: 10px; }
+.embed-critters .landing-nav .critter { width: 170px; height: 170px; }
+.embed-critters .landing-nav a { font-size: 1.1rem; gap: 14px; }
+.embed-critters .social { position: static; margin-top: 30px; transform: none; }
+.embed-critters .stag,
+.embed-critters .robot { width: 120px; height: 120px; }
+
 @media (max-width: 640px) {
+  :root { --gutter: 22px; }
+  .landing { padding-top: 8vh; }
+  .landing-nav { gap: 20px; }
+  .landing-nav .critter { width: 54px; height: 54px; }
+  #page-drawings .sketch-grid { row-gap: 56px; column-gap: 14px; }
   .lightbox-nav {
-    width: 38px;
-    height: 52px;
-    font-size: 24px;
+    top: auto;
+    bottom: 14px;
+    transform: none;
+    width: 40px;
+    height: 40px;
   }
-  .lightbox-nav.prev { left: 10px; }
-  .lightbox-nav.next { right: 10px; }
+  .lightbox-nav.prev { left: 16px; }
+  .lightbox-nav.next { right: 16px; }
+  .lightbox-counter { bottom: 26px; }
+  .lightbox img { max-width: calc(100vw - 32px); max-height: 66vh; }
 }
 
-.lightbox-close {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f0f0f0;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.lightbox-close:hover {
-  background: rgba(255, 255, 255, 0.16);
-}
-
-@media (max-width: 640px) {
-  :root { --gutter: 28px; }
-  .drawing-frame { width: 140px; }
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .landing-nav .critter,
+  .stag,
+  .robot,
+  .landing-nav a.active .eye { animation: none; }
 }

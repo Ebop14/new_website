@@ -1,0 +1,192 @@
+/* Styles for the eyes comparison page (eyes.html). */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --ink: #18171a;
+  --muted: #6c6a70;
+  --rule: rgba(24, 23, 26, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131215;
+    --card: #1c1b1f;
+    --ink: #efedf2;
+    --muted: #9a97a1;
+    --rule: rgba(239, 237, 242, 0.12);
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter Tight', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+  padding: 56px 32px 80px;
+}
+
+header {
+  max-width: 1280px;
+  margin: 0 auto 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+
+h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+header p {
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.back {
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Live preview: the real site in an iframe, rendered at desktop size and scaled down. */
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.frame iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 960px;
+  border: 0;
+  transform-origin: 0 0;
+  transform: scale(var(--s, 0.3));
+}
+
+.meta {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title-row h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+.scheme {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.66rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+.chip span:first-child {
+  height: 30px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.chip span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.actions a, .actions button {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.actions a:hover, .actions button:hover {
+  background: var(--rule);
+}
+
+@media (max-width: 640px) {
+  body { padding: 32px 16px 56px; }
+  .grid { grid-template-columns: 1fr; }
+}
+
+.picked {
+  border-color: var(--ink);
+}
