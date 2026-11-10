@@ -11,36 +11,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter+Tight:wght@400;500;600&display=swap" />
   <script src="settings.js"></script>
 </head>
-<body data-state="outside" class="no-anim">
-
-  <!-- ── Entry: the door ── -->
-  <section class="entry" aria-label="Entrance">
-    <div class="entry-name">Ethan Child</div>
-
-    <div class="scene">
-      <svg class="scene-art" viewBox="0 40 560 600" aria-hidden="true">
-        <defs>
-          <filter id="soft-shadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="8" />
-          </filter>
-        </defs>
-        <g class="shadows"></g>
-        <g class="pieces"></g>
-      </svg>
-
-      <div class="doorway" aria-hidden="true"></div>
-
-      <button class="door" type="button" aria-label="Open the door">
-        <svg viewBox="0 0 194 200" preserveAspectRatio="none" aria-hidden="true">
-          <rect class="door-face" width="194" height="200" />
-          <rect class="door-panel" x="44" y="18" width="130" height="72" />
-          <rect class="door-panel" x="44" y="108" width="130" height="74" />
-          <circle class="knob" cx="22" cy="104" r="9" />
-        </svg>
-      </button>
-    </div>
-
-  </section>
+<body class="no-anim">
 
   <!-- ── Inside ── -->
   <div class="shell">
@@ -235,14 +206,8 @@
     const nav = document.querySelectorAll('.landing-nav a');
     const pages = document.querySelectorAll('.page-content');
     const PAGES = ['about', 'built', 'drawings'];
-    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // ── Door → inside routing ──
-    // States: outside → opening → entering → inside, and back via leaving → closing.
-    let routeSeq = 0;
-    const wait = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
-    const setState = s => body.dataset.state = s;
-
+    // ── Page routing ──
     function showPage(page) {
       pages.forEach(p => p.hidden = p.id !== 'page-' + page);
       nav.forEach(n => {
@@ -253,45 +218,10 @@
       });
     }
 
-    async function route(animate = true) {
-      const seq = ++routeSeq;
-      const page = location.hash.slice(1);
-      const state = body.dataset.state;
+    const route = () => showPage(PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about');
 
-      if (PAGES.includes(page)) {
-        showPage(page);
-        if (state === 'inside' || state === 'entering') return;
-        if (animate) {
-          setState('opening');
-          await wait(380);
-          if (seq !== routeSeq) return;
-          setState('entering');
-          await wait(800);
-          if (seq !== routeSeq) return;
-        }
-        setState('inside');
-      } else {
-        if (state === 'outside' || state === 'closing') return;
-        if (animate) {
-          setState('leaving');
-          await wait(600);
-          if (seq !== routeSeq) return;
-          setState('closing');
-          await wait(420);
-          if (seq !== routeSeq) return;
-        }
-        setState('outside');
-      }
-    }
-
-    // Anywhere on the composition goes in; the door itself stays the keyboard target.
-    document.querySelector('.scene').addEventListener('click', () => {
-      if (body.dataset.state !== 'outside') return;
-      location.hash = 'about';
-    });
-
-    window.addEventListener('hashchange', () => route());
-    window.addEventListener('popstate', () => route());
+    window.addEventListener('hashchange', route);
+    window.addEventListener('popstate', route);
 
     // ── Critter eyes ──
     // Eyes with a sclera carry every style (see EYE_STYLES in themes.js);
@@ -507,7 +437,6 @@
     }, { passive: true });
     window.addEventListener('resize', updateScrollbar);
     new ResizeObserver(updateScrollbar).observe(document.querySelector('.shell'));
-    new MutationObserver(updateScrollbar).observe(body, { attributes: true, attributeFilter: ['data-state'] });
 
     thumb.addEventListener('pointerdown', e => {
       e.preventDefault();
@@ -539,90 +468,8 @@
       document.documentElement.classList.add('embed-critters');
     }
 
-    // ── Door scene ──
-    // Each plane is a slab: a darker edge face under the top face gives it
-    // thickness, and a blurred shadow behind it gives it height. Planes float
-    // on their own rhythm and shift with the pointer by depth; the door and
-    // its frame stay still as the anchor.
-    const DOOR_CENTER = [257, 458];
-    const PIECES = [
-      { pts: [[118,566],[396,564],[414,586],[100,588]], fill: 'p1', depth: 0, edge: [0, 7], still: true },
-      { pts: [[148,348],[366,348],[366,566],[148,566]], fill: 'door', depth: 0, edge: [0, 0], still: true, frame: true },
-      { pts: [[414,362],[496,364],[398,556],[352,556],[352,456]], fill: 'p3', depth: 10, edge: [5, 9] },
-      { pts: [[92,270],[444,266],[504,350],[74,356]], fill: 'p1', depth: 7, edge: [4, 10] },
-      { pts: [[154,142],[412,140],[408,240],[156,240]], fill: 'p1', depth: 13, edge: [3, 20] },
-      { pts: [[272,108],[340,86],[494,190],[480,272]], fill: 'p2', depth: 20, edge: [5, 10] },
-      { pts: [[58,96],[140,82],[152,168],[50,180]], fill: 'p3', depth: 16, edge: [4, 9] },
-    ];
-
-    function buildScene() {
-      const NS = 'http://www.w3.org/2000/svg';
-      const art = document.querySelector('.scene-art');
-      const shadows = art.querySelector('.shadows');
-      const pieces = art.querySelector('.pieces');
-      const el = (tag, attrs, parent) => {
-        const n = document.createElementNS(NS, tag);
-        Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
-        parent.appendChild(n);
-        return n;
-      };
-      const pts = (list, [dx, dy] = [0, 0]) => list.map(([x, y]) => (x + dx) + ',' + (y + dy)).join(' ');
-
-
-      // Deterministic jitter so the float rhythm is the same on every visit.
-      let seed = 11;
-      const rand = () => (seed = seed * 16807 % 2147483647) / 2147483647;
-
-      PIECES.forEach((p, i) => {
-        const cx = p.pts.reduce((s, q) => s + q[0], 0) / p.pts.length;
-        const cy = p.pts.reduce((s, q) => s + q[1], 0) / p.pts.length;
-        // Still pieces (the door's frame and floor) never spread or fly in.
-        const len = p.still ? Infinity : Math.hypot(cx - DOOR_CENTER[0], cy - DOOR_CENTER[1]) || 1;
-        const vars = [
-          `--depth:${p.depth}`,
-          `--ux:${((cx - DOOR_CENTER[0]) / len).toFixed(3)}`,
-          `--uy:${((cy - DOOR_CENTER[1]) / len).toFixed(3)}`,
-          `--ad:${i * 60}ms`,
-          `--dur:${(6 + rand() * 5).toFixed(2)}s`,
-          `--delay:${(-rand() * 11).toFixed(2)}s`,
-          `--tdur:${(9 + rand() * 7).toFixed(2)}s`,
-          `--tdelay:${(-rand() * 16).toFixed(2)}s`,
-          `--fx:${((rand() - 0.5) * 3).toFixed(1)}px`,
-          `--fy:${(-2.5 - rand() * 2.5).toFixed(1)}px`,
-          `--fr:${((rand() - 0.5) * 0.5).toFixed(2)}deg`,
-        ].join(';');
-        const cls = p.still ? 'still' : 'float';
-
-        if (p.depth) {
-          const lift = [10 + p.depth * 0.6, 14 + p.depth * 0.9];
-          const s = el('g', { class: 'piece shadow', style: vars }, shadows);
-          const sa = el('g', { class: 'arrive' }, s);
-          const sf = el('g', { class: cls }, sa);
-          el('polygon', { points: pts(p.pts, lift), filter: 'url(#soft-shadow)' }, sf);
-        }
-
-        const g = el('g', { class: 'piece', style: vars }, pieces);
-        const a = el('g', { class: 'arrive' }, g);
-        const f = el('g', { class: cls }, a);
-        if (p.edge[0] || p.edge[1]) {
-          el('polygon', { points: pts(p.pts, p.edge), class: 'edge', style: `--c:var(--${p.fill})` }, f);
-        }
-        el('polygon', {
-          points: pts(p.pts),
-          class: p.frame ? 'face frame' : 'face',
-          style: `--c:var(--${p.fill})`,
-        }, f);
-      });
-    }
-    buildScene();
-
     // ── Initial state ──
-    // Deep links (#about, #built) skip the door; otherwise the planes fly in and settle.
-    if (PAGES.includes(location.hash.slice(1))) {
-      route(false);
-    } else if (!reduceMotion) {
-      body.classList.add('assembling');
-    }
+    route();
     requestAnimationFrame(() => requestAnimationFrame(() => body.classList.remove('no-anim')));
   </script>
 </body>
