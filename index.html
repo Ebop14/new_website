@@ -94,16 +94,21 @@
       <!-- Built -->
       <!-- Drawings -->
       <div id="page-drawings" class="page-content" hidden>
-        <div class="sketch-grid"></div>
+        <div class="carousel" aria-roledescription="carousel" aria-label="Drawings">
+          <div class="carousel-stage"></div>
+          <div class="carousel-count" aria-live="polite"></div>
+        </div>
       </div>
 
       <div id="page-built" class="page-content" hidden>
         <ul class="built-list">
           <li>
             <span class="label">Glass</span>
+            <span class="impact">helped organize plugins / connectors</span>
           </li>
           <li>
             <span class="label">Connectors service</span>
+            <span class="impact">an internal mcp service that supports all of ramp's agents</span>
           </li>
           <li>
             <span class="label">AI email writing agent for Ramp AEs</span>
@@ -206,6 +211,7 @@
     const nav = document.querySelectorAll('.landing-nav a');
     const pages = document.querySelectorAll('.page-content');
     const PAGES = ['about', 'built', 'drawings'];
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ── Page routing ──
     function showPage(page) {
@@ -218,7 +224,10 @@
       });
     }
 
-    const route = () => showPage(PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about');
+    const route = () => {
+      showPage(PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about');
+      startCards();
+    };
 
     window.addEventListener('hashchange', route);
     window.addEventListener('popstate', route);
@@ -315,30 +324,156 @@
       { src: 'photos/origins/scribble.jpg', critter: '.landing-nav a[data-page="drawings"] .critter', crit: 'var(--p3)' },
     ];
 
-    // One grid: the critters' sketches first, then the rest of the drawings.
+    // One set: the critters' sketches first, then the rest of the drawings.
     const sketches = [...originSources, ...drawingSources.map(src => ({ src }))];
-    const sketchGrid = document.querySelector('.sketch-grid');
 
-    sketches.forEach(({ src, critter, crit }, i) => {
+    // ── Carousel ──
+    // Cards float across a full-bleed stage. The one nearest the center is lifted
+    // and lit; the rest shrink, tilt and dim toward the edges. It advances by
+    // itself, pauses while you touch it, and wraps around.
+    const carousel = document.querySelector('.carousel');
+    const stage = carousel.querySelector('.carousel-stage');
+    const carouselCount = carousel.querySelector('.carousel-count');
+    const nameEl = document.querySelector('.name');
+    const N = sketches.length;
+    const mod = (a, n) => ((a % n) + n) % n;
+
+    const cards = sketches.map(({ src, critter, crit }, i) => {
+      const card = document.createElement('div');
+      card.className = 'card' + (i % 2 ? ' peek-left' : '');
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'sketch';
       b.setAttribute('aria-label', 'Open drawing ' + (i + 1));
-      b.innerHTML = '<img src="' + src + '" alt="" loading="lazy" draggable="false" />';
-      b.addEventListener('click', () => openLightbox(i));
-      if (!critter) {
-        sketchGrid.appendChild(b);
-        return;
-      }
+      b.innerHTML = '<img src="' + src + '" alt="" draggable="false" />';
       // A copy of the finished critter, tucked behind its sketch's top edge.
-      const fig = document.createElement('figure');
-      fig.className = 'origin' + (i % 2 ? ' peek-left' : '');
-      const peek = document.querySelector(critter).cloneNode(true);
-      peek.classList.add('peek');
-      peek.style.setProperty('--crit', crit);
-      fig.appendChild(peek);
-      fig.appendChild(b);
-      sketchGrid.appendChild(fig);
+      if (critter) {
+        const peek = document.querySelector(critter).cloneNode(true);
+        peek.classList.add('peek');
+        peek.style.setProperty('--crit', crit);
+        card.appendChild(peek);
+      }
+      card.appendChild(b);
+      stage.appendChild(card);
+      return { card, b };
+    });
+
+    let pos = 0, target = 0, paused = false, dragging = false, lastAdvance = 0;
+    let cardsRaf = 0, lastT = 0, hovering = false;
+    const ADVANCE_MS = 8000;
+
+    // Move the target to the nearest copy of card k.
+    const goTo = k => { target += mod(k - target + N / 2, N) - N / 2; lastAdvance = performance.now(); };
+
+    function layoutCards(t) {
+      const w = stage.clientWidth;
+      const cw = cards[0].card.offsetWidth;
+      const spacing = cw * 1.08;
+      // The focused card's left edge lines up with the text column (the name above).
+      const anchor = nameEl.getBoundingClientRect().left - stage.getBoundingClientRect().left + cw / 2;
+      const still = reduceMotion;
+      let focus = 0, best = 9;
+      cards.forEach(({ card, b }, i) => {
+        const d = mod(i - pos + N / 2, N) - N / 2;
+        const ad = Math.abs(d);
+        const c = Math.max(0, 1 - ad);
+        const x = anchor + d * spacing;
+        const bob = still ? 0 : Math.sin(t / 2800 + i * 1.9) * 7 * (0.4 + c);
+        const y = d * d * 5 + bob;
+        const rot = Math.max(-1, Math.min(1, d)) * 5 + (still ? 0 : Math.sin(t / 4200 + i * 2.3) * 0.8);
+        const scale = 0.74 + 0.3 * c;
+        card.style.transform = `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+        card.style.opacity = Math.max(0, 0.45 + 0.55 * c - Math.max(0, x - w * 0.8) / (w * 0.2)).toFixed(3);
+        card.style.zIndex = Math.round(100 - ad * 10);
+        card.style.visibility = Math.abs(x - anchor) > w ? 'hidden' : '';
+        if (ad < best) { best = ad; focus = i; }
+      });
+      cards.forEach(({ card, b }, i) => {
+        const on = i === focus;
+        card.classList.toggle('focus', on);
+        b.tabIndex = on ? 0 : -1;
+      });
+      carouselCount.style.paddingLeft = (anchor - cw / 2) + 'px';
+      carouselCount.textContent = (focus + 1) + ' / ' + N;
+    }
+
+    function tick(t) {
+      cardsRaf = 0;
+      if (!carousel.offsetParent) return;           // page hidden: stop until shown again
+      const dt = Math.min(0.05, (t - (lastT || t)) / 1000);
+      lastT = t;
+      if (!dragging) {
+        if (!paused && !hovering && !reduceMotion && lightbox.hidden && t - lastAdvance > ADVANCE_MS) {
+          target = Math.round(target) + 1;
+          lastAdvance = t;
+        }
+        pos += (target - pos) * (1 - Math.exp(-dt * 1.4));
+        if (Math.abs(target - pos) < 0.0005) pos = target;
+      }
+      layoutCards(t);
+      cardsRaf = requestAnimationFrame(tick);
+    }
+    const startCards = () => { if (!cardsRaf) { lastT = 0; lastAdvance = performance.now(); cardsRaf = requestAnimationFrame(tick); } };
+
+    // Drag to move; a click on the centered card opens it, on any other card brings it forward.
+    let dragX = 0, dragPos = 0, dragMoved = 0, dragV = 0, dragLastX = 0, dragLastT = 0;
+    stage.addEventListener('pointerdown', e => {
+      dragging = true; dragMoved = 0; dragV = 0;
+      dragX = dragLastX = e.clientX; dragLastT = performance.now(); dragPos = pos;
+      stage.setPointerCapture(e.pointerId);
+    });
+    stage.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const spacing = cards[0].card.offsetWidth * 1.08;
+      dragMoved = Math.max(dragMoved, Math.abs(e.clientX - dragX));
+      pos = dragPos - (e.clientX - dragX) / spacing;
+      const now = performance.now();
+      dragV = (dragLastX - e.clientX) / spacing / Math.max(1, now - dragLastT) * 1000;
+      dragLastX = e.clientX; dragLastT = now;
+      target = pos;
+    });
+    const endDrag = e => {
+      if (!dragging) return;
+      dragging = false;
+      if (dragMoved > 6) {
+        target = Math.round(pos + Math.max(-2, Math.min(2, dragV * 0.25)));
+        lastAdvance = performance.now();
+      } else {
+        const hit = e.target.closest && e.target.closest('.card');
+        const i = hit ? cards.findIndex(c => c.card === hit) : -1;
+        if (i >= 0) {
+          if (Math.abs(mod(i - pos + N / 2, N) - N / 2) < 0.5) openLightbox(i);
+          else goTo(i);
+        }
+      }
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('click', e => { if (dragMoved > 6) e.stopPropagation(); });
+
+    // Keyboard focus on a card brings it to the center (Enter opens it via its button).
+    stage.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const i = cards.findIndex(c => c.b === document.activeElement);
+        if (i >= 0) openLightbox(i);
+      }
+    });
+    stage.addEventListener('focusin', e => { paused = true; const i = cards.findIndex(c => c.b === e.target); if (i >= 0) goTo(i); });
+    stage.addEventListener('focusout', () => { paused = false; lastAdvance = performance.now(); });
+    carousel.addEventListener('pointerenter', () => hovering = true);
+    carousel.addEventListener('pointerleave', () => { hovering = false; lastAdvance = performance.now(); });
+    carousel.addEventListener('wheel', e => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      target = pos + e.deltaX / (cards[0].card.offsetWidth * 1.08);
+      clearTimeout(carousel._snap);
+      carousel._snap = setTimeout(() => { target = Math.round(target); }, 120);
+    }, { passive: false });
+    document.addEventListener('keydown', e => {
+      if (!lightbox.hidden || !carousel.offsetParent || e.target.closest('input, textarea')) return;
+      if (e.key === 'ArrowLeft') { target = Math.round(target) - 1; lastAdvance = performance.now(); }
+      else if (e.key === 'ArrowRight') { target = Math.round(target) + 1; lastAdvance = performance.now(); }
     });
 
     const lightbox = document.querySelector('.lightbox');
@@ -385,6 +520,7 @@
 
     function closeLightbox() {
       lightbox.classList.remove('open');
+      goTo(lightboxIndex);
       lightbox.addEventListener('transitionend', () => {
         lightbox.hidden = true;
         lightboxImg.src = '';

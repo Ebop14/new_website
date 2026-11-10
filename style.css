@@ -86,7 +86,7 @@ body {
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
-  margin-bottom: 36px;
+  margin-bottom: clamp(16px, 2.6vw, 36px);
 }
 
 /* ── Critters ── */
@@ -226,7 +226,7 @@ body {
 .landing-nav {
   display: flex;
   gap: 32px;
-  margin-bottom: 40px;
+  margin-bottom: clamp(16px, 2.8vw, 40px);
 }
 
 .landing-nav a {
@@ -246,8 +246,8 @@ body {
 .landing-nav a:nth-child(3) { --crit: var(--p3); }
 
 .landing-nav .critter {
-  width: 64px;
-  height: 64px;
+  width: clamp(44px, 5vw, 64px);
+  height: clamp(44px, 5vw, 64px);
   transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
@@ -537,30 +537,80 @@ html::-webkit-scrollbar {
 /* ── Drawings ── */
 #page-drawings {
   max-width: none;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.sketch-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
+#page-drawings[hidden] { display: none; }
+
+/* The drawings page is exactly one screen: no scrolling. */
+.shell:has(#page-drawings:not([hidden])) {
+  height: 100vh;
+  min-height: 0;
 }
 
-.origin {
-  margin: 0;
+.shell:has(#page-drawings:not([hidden])) .landing {
+  min-height: 0;
+  padding: min(6vh, 4.5vw) 0 clamp(36px, 5vw, 64px);
 }
 
-/* Room above every row for a critter to peek over its sketch. */
-#page-drawings .sketch-grid {
-  row-gap: 72px;
-  margin-top: 64px;
+/* Full-bleed stage: cards float across the whole screen, not the text column. */
+.carousel {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  margin: clamp(8px, 1.7vw, 24px) 0 0 calc(50% - 50vw);
+  overflow-x: clip;
+  touch-action: pan-y;
 }
 
-.origin { position: relative; }
-.origin .sketch { position: relative; z-index: 1; }
+.carousel-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  cursor: grab;
+  user-select: none;
+}
+
+.carousel-stage:active { cursor: grabbing; }
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  /* Capped by the stage height too, so a card (and the critter over it) always fits. */
+  width: min(clamp(190px, 38vw, 330px), 56cqh);
+  will-change: transform, opacity;
+}
+
+.card .sketch {
+  width: 100%;
+  border-radius: 10px;
+  cursor: inherit;
+}
+
+.card.focus .sketch { cursor: zoom-in; }
+
+.carousel-count {
+  margin-top: 8px;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.card .sketch { position: relative; z-index: 1; }
 
 /* The critter sits behind the photo with just its head over the top edge,
    and pops up a little when its sketch is hovered. */
-.origin .peek {
+.card .peek {
   position: absolute;
   z-index: 0;
   top: 0;
@@ -575,30 +625,24 @@ html::-webkit-scrollbar {
   pointer-events: none;
 }
 
-.origin.peek-left .peek {
+.card.peek-left .peek {
   right: auto;
   left: 10%;
   transform: translateY(-42%) rotate(-5deg);
 }
 
 /* Minimal critters keep their faces low in the drawing, so they rise further. */
-.origin .peek.minimal { transform: translateY(-60%) rotate(5deg); }
-.origin.peek-left .peek.minimal { transform: translateY(-60%) rotate(-5deg); }
+.card .peek.minimal { transform: translateY(-60%) rotate(5deg); }
+.card.peek-left .peek.minimal { transform: translateY(-60%) rotate(-5deg); }
 
-.origin:hover .peek,
-.origin:focus-within .peek {
-  transform: translateY(-62%) rotate(-2deg);
-}
-
-.origin.peek-left:hover .peek,
-.origin.peek-left:focus-within .peek {
-  transform: translateY(-62%) rotate(2deg);
-}
-
-.origin:hover .peek.minimal,
-.origin:focus-within .peek.minimal { transform: translateY(-86%) rotate(-2deg); }
-.origin.peek-left:hover .peek.minimal,
-.origin.peek-left:focus-within .peek.minimal { transform: translateY(-86%) rotate(2deg); }
+.card:hover .peek,
+.card.focus .peek { transform: translateY(-62%) rotate(-2deg); }
+.card.peek-left:hover .peek,
+.card.peek-left.focus .peek { transform: translateY(-62%) rotate(2deg); }
+.card:hover .peek.minimal,
+.card.focus .peek.minimal { transform: translateY(-86%) rotate(-2deg); }
+.card.peek-left:hover .peek.minimal,
+.card.peek-left.focus .peek.minimal { transform: translateY(-86%) rotate(2deg); }
 
 .sketch {
   display: block;
@@ -619,12 +663,6 @@ html::-webkit-scrollbar {
   object-fit: cover;
   user-select: none;
   -webkit-user-drag: none;
-}
-
-/* No shadows or glow on photos: hovering just lifts them. */
-.sketch:hover,
-.sketch:focus-visible {
-  transform: translateY(-3px);
 }
 
 .sketch:focus-visible {
@@ -796,8 +834,8 @@ html::-webkit-scrollbar {
   :root { --gutter: 22px; }
   .landing { padding-top: 8vh; }
   .landing-nav { gap: 20px; }
-  .landing-nav .critter { width: 54px; height: 54px; }
-  #page-drawings .sketch-grid { row-gap: 56px; column-gap: 14px; }
+  .landing-nav .critter { width: clamp(40px, 12vw, 54px); height: clamp(40px, 12vw, 54px); }
+  .card { width: min(62vw, 56cqh); }
   .lightbox-nav {
     top: auto;
     bottom: 14px;
